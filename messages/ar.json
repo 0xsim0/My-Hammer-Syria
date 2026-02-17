@@ -1,0 +1,312 @@
+{
+  "common": {
+    "loading": "جار التحميل...",
+    "error": "حدث خطأ",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "back": "رجوع",
+    "next": "التالي",
+    "submit": "إرسال",
+    "search": "بحث",
+    "filter": "تصفية",
+    "clear": "مسح",
+    "viewAll": "عرض الكل",
+    "seeMore": "عرض المزيد",
+    "close": "إغلاق",
+    "confirm": "تأكيد",
+    "yes": "نعم",
+    "no": "لا",
+    "success": "تم بنجاح",
+    "required": "مطلوب",
+    "optional": "اختياري",
+    "noResults": "لا توجد نتائج",
+    "selectOption": "اختر...",
+    "currency": {
+      "SYP": "ل.س",
+      "USD": "دولار"
+    }
+  },
+  "nav": {
+    "home": "الرئيسية",
+    "findJobs": "ابحث عن عمل",
+    "postJob": "انشر طلباً",
+    "myJobs": "طلباتي",
+    "myBids": "عروضي",
+    "messages": "الرسائل",
+    "profile": "الملف الشخصي",
+    "notifications": "الإشعارات",
+    "login": "تسجيل الدخول",
+    "register": "إنشاء حساب",
+    "logout": "تسجيل الخروج",
+    "admin": "لوحة الإدارة",
+    "switchToCustomer": "التبديل إلى عميل",
+    "switchToCraftsman": "التبديل إلى حرفي"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "register": "إنشاء حساب",
+    "logout": "تسجيل الخروج",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "name": "الاسم الكامل",
+    "phone": "رقم الهاتف",
+    "role": "نوع الحساب",
+    "customer": "عميل (أبحث عن حرفي)",
+    "craftsman": "حرفي (أقدم خدمات)",
+    "governorate": "المحافظة",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "alreadyHaveAccount": "لديك حساب؟",
+    "dontHaveAccount": "ليس لديك حساب؟",
+    "loginHere": "سجل الدخول هنا",
+    "registerHere": "أنشئ حساباً هنا",
+    "errors": {
+      "invalidEmail": "بريد إلكتروني غير صالح",
+      "passwordTooShort": "كلمة المرور يجب أن تكون 8 أحرف على الأقل",
+      "passwordsDoNotMatch": "كلمتا المرور غير متطابقتين",
+      "emailAlreadyExists": "هذا البريد الإلكتروني مسجل مسبقاً",
+      "invalidCredentials": "بريد إلكتروني أو كلمة مرور غير صحيحة",
+      "accountNotFound": "الحساب غير موجود"
+    }
+  },
+  "landing": {
+    "hero": {
+      "title": "اعثر على الحرفي المثالي في سوريا",
+      "subtitle": "اكبر منصة لربط العملاء بالحرفيين والمقاولين الموثوقين في جميع المحافظات السورية",
+      "postJob": "انشر طلبك الآن",
+      "findWork": "ابحث عن عمل",
+      "stats": {
+        "craftsmen": "حرفي موثوق",
+        "jobs": "مشروع منجز",
+        "cities": "محافظة"
+      }
+    },
+    "howItWorks": {
+      "title": "كيف يعمل My Hammer Syria؟",
+      "step1": {
+        "title": "انشر طلبك",
+        "description": "صف المشروع الذي تحتاجه، حدد ميزانيتك والمنطقة"
+      },
+      "step2": {
+        "title": "استقبل العروض",
+        "description": "يتواصل معك الحرفيون بعروض أسعار مناسبة"
+      },
+      "step3": {
+        "title": "اختر الأفضل",
+        "description": "قارن العروض واختر الحرفي المناسب بناءً على تقييماته"
+      },
+      "step4": {
+        "title": "أنجز المشروع",
+        "description": "تابع العمل وادفع بأمان عند الانتهاء"
+      }
+    },
+    "categories": {
+      "title": "تصفح حسب الخدمة",
+      "viewAll": "عرض كل الخدمات"
+    },
+    "featuredJobs": {
+      "title": "أحدث الطلبات",
+      "viewAll": "عرض كل الطلبات"
+    },
+    "cta": {
+      "craftsman": {
+        "title": "هل أنت حرفي ماهر؟",
+        "description": "انضم إلى آلاف الحرفيين وابدأ في استقبال الطلبات من عملاء في منطقتك",
+        "button": "سجل كحرفي"
+      }
+    }
+  },
+  "jobs": {
+    "post": {
+      "title": "انشر طلب جديد",
+      "jobTitle": "عنوان الطلب",
+      "jobTitlePlaceholder": "مثال: إصلاح سباكة المطبخ",
+      "category": "فئة العمل",
+      "description": "وصف تفصيلي",
+      "descriptionPlaceholder": "اشرح ما تحتاجه بالتفصيل...",
+      "governorate": "المحافظة",
+      "address": "العنوان التفصيلي",
+      "budgetMin": "الميزانية الدنيا",
+      "budgetMax": "الميزانية القصوى",
+      "currency": "العملة",
+      "deadline": "آخر موعد لإنجاز العمل",
+      "images": "صور (اختياري)",
+      "uploadImages": "اضغط لرفع الصور",
+      "submit": "نشر الطلب",
+      "success": "تم نشر طلبك بنجاح!",
+      "errors": {
+        "titleRequired": "عنوان الطلب مطلوب",
+        "categoryRequired": "الفئة مطلوبة",
+        "descriptionRequired": "الوصف مطلوب",
+        "governorateRequired": "المحافظة مطلوبة"
+      }
+    },
+    "list": {
+      "title": "لوحة الطلبات",
+      "noJobs": "لا توجد طلبات متاحة حالياً",
+      "filter": {
+        "category": "الفئة",
+        "governorate": "المحافظة",
+        "budget": "الميزانية",
+        "currency": "العملة"
+      }
+    },
+    "detail": {
+      "postedBy": "نشر بواسطة",
+      "postedAt": "تاريخ النشر",
+      "deadline": "الموعد النهائي",
+      "budget": "الميزانية",
+      "governorate": "المحافظة",
+      "bids": "العروض",
+      "noBids": "لا توجد عروض بعد",
+      "placeBid": "قدم عرضك",
+      "viewBids": "عرض العروض"
+    },
+    "status": {
+      "OPEN": "مفتوح",
+      "IN_PROGRESS": "قيد التنفيذ",
+      "COMPLETED": "مكتمل",
+      "CANCELLED": "ملغى"
+    },
+    "myJobs": {
+      "title": "طلباتي",
+      "noJobs": "لم تنشر أي طلبات بعد",
+      "postFirst": "انشر طلبك الأول"
+    },
+    "complete": {
+      "button": "تأكيد اكتمال العمل",
+      "confirm": "هل أنت متأكد أن العمل قد اكتمل؟",
+      "success": "تم تأكيد اكتمال العمل"
+    }
+  },
+  "bids": {
+    "title": "قدم عرضك",
+    "price": "السعر",
+    "currency": "العملة",
+    "estimatedDays": "المدة التقديرية (بالأيام)",
+    "message": "رسالتك للعميل",
+    "messagePlaceholder": "اشرح خبرتك وسبب اختيارك...",
+    "submit": "إرسال العرض",
+    "accept": "قبول العرض",
+    "reject": "رفض العرض",
+    "withdraw": "سحب العرض",
+    "status": {
+      "PENDING": "بانتظار الرد",
+      "ACCEPTED": "مقبول",
+      "REJECTED": "مرفوض",
+      "WITHDRAWN": "مسحوب"
+    },
+    "myBids": {
+      "title": "عروضي",
+      "noBids": "لم تقدم أي عروض بعد"
+    },
+    "success": "تم إرسال عرضك بنجاح!",
+    "errors": {
+      "priceRequired": "السعر مطلوب",
+      "daysRequired": "المدة مطلوبة",
+      "messageRequired": "الرسالة مطلوبة",
+      "alreadyBid": "لقد قدمت عرضاً لهذا الطلب مسبقاً"
+    }
+  },
+  "profile": {
+    "title": "الملف الشخصي",
+    "edit": "تعديل الملف الشخصي",
+    "businessName": "اسم العمل / الشركة",
+    "bio": "نبذة عنك",
+    "yearsExperience": "سنوات الخبرة",
+    "categories": "التخصصات",
+    "portfolio": "أعمالي السابقة",
+    "addPortfolioItem": "إضافة صورة",
+    "reviews": "التقييمات",
+    "noReviews": "لا توجد تقييمات بعد",
+    "avgRating": "متوسط التقييم",
+    "totalReviews": "إجمالي التقييمات",
+    "isAvailable": "متاح للعمل",
+    "notAvailable": "غير متاح حالياً",
+    "joinedAt": "عضو منذ",
+    "governorate": "المحافظة",
+    "phone": "الهاتف"
+  },
+  "reviews": {
+    "title": "تقييم الحرفي",
+    "rating": "التقييم العام",
+    "quality": "جودة العمل",
+    "punctuality": "الالتزام بالمواعيد",
+    "comment": "تعليقك",
+    "commentPlaceholder": "شارك تجربتك مع هذا الحرفي...",
+    "submit": "إرسال التقييم",
+    "success": "شكراً! تم إرسال تقييمك",
+    "stars": "{count} نجوم"
+  },
+  "chat": {
+    "title": "الرسائل",
+    "noConversations": "لا توجد محادثات بعد",
+    "typeMessage": "اكتب رسالتك...",
+    "send": "إرسال",
+    "you": "أنت",
+    "online": "متصل",
+    "offline": "غير متصل"
+  },
+  "payment": {
+    "title": "الدفع",
+    "amount": "المبلغ",
+    "method": "طريقة الدفع",
+    "methods": {
+      "STRIPE": "بطاقة ائتمانية",
+      "CASH": "نقداً عند التسليم",
+      "BANK_TRANSFER": "تحويل بنكي",
+      "SYRIATEL_CASH": "Syriatel Cash"
+    },
+    "cardDetails": "بيانات البطاقة",
+    "pay": "ادفع الآن",
+    "success": "تم الدفع بنجاح!",
+    "failed": "فشلت عملية الدفع",
+    "uploadReceipt": "رفع إيصال التحويل"
+  },
+  "notifications": {
+    "title": "الإشعارات",
+    "noNotifications": "لا توجد إشعارات",
+    "markAllRead": "تعيين الكل كمقروء",
+    "types": {
+      "NEW_BID": "عرض جديد على طلبك",
+      "BID_ACCEPTED": "تم قبول عرضك",
+      "BID_REJECTED": "تم رفض عرضك",
+      "JOB_COMPLETED": "تم إكمال المشروع",
+      "NEW_MESSAGE": "رسالة جديدة",
+      "NEW_REVIEW": "تقييم جديد",
+      "PAYMENT_RECEIVED": "تم استلام الدفع"
+    }
+  },
+  "governorates": {
+    "Damascus": "دمشق",
+    "Aleppo": "حلب",
+    "Homs": "حمص",
+    "Hama": "حماة",
+    "Latakia": "اللاذقية",
+    "Deir ez-Zor": "دير الزور",
+    "Raqqa": "الرقة",
+    "Hasakah": "الحسكة",
+    "Daraa": "درعا",
+    "Idlib": "إدلب",
+    "Quneitra": "القنيطرة",
+    "Tartus": "طرطوس",
+    "As-Suwayda": "السويداء",
+    "Rural Damascus": "ريف دمشق"
+  },
+  "errors": {
+    "404": "الصفحة غير موجودة",
+    "500": "خطأ في الخادم",
+    "unauthorized": "غير مصرح لك بهذا الإجراء",
+    "forbidden": "ممنوع الوصول",
+    "goHome": "العودة إلى الرئيسية"
+  },
+  "footer": {
+    "about": "عن المنصة",
+    "contact": "تواصل معنا",
+    "terms": "الشروط والأحكام",
+    "privacy": "سياسة الخصوصية",
+    "copyright": "© 2024 My Hammer Syria. جميع الحقوق محفوظة."
+  }
+}

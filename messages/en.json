@@ -1,0 +1,312 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "search": "Search",
+    "filter": "Filter",
+    "clear": "Clear",
+    "viewAll": "View All",
+    "seeMore": "See More",
+    "close": "Close",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "success": "Success",
+    "required": "Required",
+    "optional": "Optional",
+    "noResults": "No results found",
+    "selectOption": "Select...",
+    "currency": {
+      "SYP": "SYP",
+      "USD": "USD"
+    }
+  },
+  "nav": {
+    "home": "Home",
+    "findJobs": "Find Jobs",
+    "postJob": "Post a Job",
+    "myJobs": "My Jobs",
+    "myBids": "My Bids",
+    "messages": "Messages",
+    "profile": "Profile",
+    "notifications": "Notifications",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "admin": "Admin Panel",
+    "switchToCustomer": "Switch to Customer",
+    "switchToCraftsman": "Switch to Craftsman"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Create Account",
+    "logout": "Logout",
+    "email": "Email Address",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "name": "Full Name",
+    "phone": "Phone Number",
+    "role": "Account Type",
+    "customer": "Customer (Looking for a craftsman)",
+    "craftsman": "Craftsman (Offering services)",
+    "governorate": "Governorate",
+    "forgotPassword": "Forgot password?",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "loginHere": "Login here",
+    "registerHere": "Register here",
+    "errors": {
+      "invalidEmail": "Invalid email address",
+      "passwordTooShort": "Password must be at least 8 characters",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "emailAlreadyExists": "This email is already registered",
+      "invalidCredentials": "Invalid email or password",
+      "accountNotFound": "Account not found"
+    }
+  },
+  "landing": {
+    "hero": {
+      "title": "Find the Perfect Craftsman in Syria",
+      "subtitle": "Syria's largest platform connecting customers with trusted craftsmen and contractors across all governorates",
+      "postJob": "Post Your Job Now",
+      "findWork": "Find Work",
+      "stats": {
+        "craftsmen": "Trusted Craftsmen",
+        "jobs": "Completed Projects",
+        "cities": "Governorates"
+      }
+    },
+    "howItWorks": {
+      "title": "How My Hammer Syria Works",
+      "step1": {
+        "title": "Post Your Job",
+        "description": "Describe what you need, set your budget and location"
+      },
+      "step2": {
+        "title": "Receive Quotes",
+        "description": "Craftsmen contact you with competitive quotes"
+      },
+      "step3": {
+        "title": "Choose the Best",
+        "description": "Compare quotes and pick the right craftsman based on ratings"
+      },
+      "step4": {
+        "title": "Get it Done",
+        "description": "Track progress and pay securely upon completion"
+      }
+    },
+    "categories": {
+      "title": "Browse by Service",
+      "viewAll": "View All Services"
+    },
+    "featuredJobs": {
+      "title": "Latest Jobs",
+      "viewAll": "View All Jobs"
+    },
+    "cta": {
+      "craftsman": {
+        "title": "Are You a Skilled Craftsman?",
+        "description": "Join thousands of craftsmen and start receiving jobs from customers in your area",
+        "button": "Register as Craftsman"
+      }
+    }
+  },
+  "jobs": {
+    "post": {
+      "title": "Post a New Job",
+      "jobTitle": "Job Title",
+      "jobTitlePlaceholder": "e.g. Fix kitchen sink plumbing",
+      "category": "Job Category",
+      "description": "Detailed Description",
+      "descriptionPlaceholder": "Describe what you need in detail...",
+      "governorate": "Governorate",
+      "address": "Detailed Address",
+      "budgetMin": "Minimum Budget",
+      "budgetMax": "Maximum Budget",
+      "currency": "Currency",
+      "deadline": "Project Deadline",
+      "images": "Photos (optional)",
+      "uploadImages": "Click to upload photos",
+      "submit": "Post Job",
+      "success": "Your job has been posted successfully!",
+      "errors": {
+        "titleRequired": "Job title is required",
+        "categoryRequired": "Category is required",
+        "descriptionRequired": "Description is required",
+        "governorateRequired": "Governorate is required"
+      }
+    },
+    "list": {
+      "title": "Job Board",
+      "noJobs": "No jobs available at the moment",
+      "filter": {
+        "category": "Category",
+        "governorate": "Governorate",
+        "budget": "Budget",
+        "currency": "Currency"
+      }
+    },
+    "detail": {
+      "postedBy": "Posted by",
+      "postedAt": "Posted",
+      "deadline": "Deadline",
+      "budget": "Budget",
+      "governorate": "Governorate",
+      "bids": "Bids",
+      "noBids": "No bids yet",
+      "placeBid": "Place Your Bid",
+      "viewBids": "View Bids"
+    },
+    "status": {
+      "OPEN": "Open",
+      "IN_PROGRESS": "In Progress",
+      "COMPLETED": "Completed",
+      "CANCELLED": "Cancelled"
+    },
+    "myJobs": {
+      "title": "My Jobs",
+      "noJobs": "You haven't posted any jobs yet",
+      "postFirst": "Post your first job"
+    },
+    "complete": {
+      "button": "Mark as Complete",
+      "confirm": "Are you sure the job is complete?",
+      "success": "Job marked as complete"
+    }
+  },
+  "bids": {
+    "title": "Place Your Bid",
+    "price": "Price",
+    "currency": "Currency",
+    "estimatedDays": "Estimated Days",
+    "message": "Message to Customer",
+    "messagePlaceholder": "Explain your experience and why they should choose you...",
+    "submit": "Submit Bid",
+    "accept": "Accept Bid",
+    "reject": "Reject Bid",
+    "withdraw": "Withdraw Bid",
+    "status": {
+      "PENDING": "Pending",
+      "ACCEPTED": "Accepted",
+      "REJECTED": "Rejected",
+      "WITHDRAWN": "Withdrawn"
+    },
+    "myBids": {
+      "title": "My Bids",
+      "noBids": "You haven't placed any bids yet"
+    },
+    "success": "Your bid has been submitted successfully!",
+    "errors": {
+      "priceRequired": "Price is required",
+      "daysRequired": "Estimated days is required",
+      "messageRequired": "Message is required",
+      "alreadyBid": "You have already placed a bid on this job"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "edit": "Edit Profile",
+    "businessName": "Business / Company Name",
+    "bio": "About You",
+    "yearsExperience": "Years of Experience",
+    "categories": "Specializations",
+    "portfolio": "Past Work",
+    "addPortfolioItem": "Add Photo",
+    "reviews": "Reviews",
+    "noReviews": "No reviews yet",
+    "avgRating": "Average Rating",
+    "totalReviews": "Total Reviews",
+    "isAvailable": "Available for Work",
+    "notAvailable": "Currently Unavailable",
+    "joinedAt": "Member since",
+    "governorate": "Governorate",
+    "phone": "Phone"
+  },
+  "reviews": {
+    "title": "Review Craftsman",
+    "rating": "Overall Rating",
+    "quality": "Work Quality",
+    "punctuality": "Punctuality",
+    "comment": "Your Review",
+    "commentPlaceholder": "Share your experience with this craftsman...",
+    "submit": "Submit Review",
+    "success": "Thank you! Your review has been submitted",
+    "stars": "{count} stars"
+  },
+  "chat": {
+    "title": "Messages",
+    "noConversations": "No conversations yet",
+    "typeMessage": "Type your message...",
+    "send": "Send",
+    "you": "You",
+    "online": "Online",
+    "offline": "Offline"
+  },
+  "payment": {
+    "title": "Payment",
+    "amount": "Amount",
+    "method": "Payment Method",
+    "methods": {
+      "STRIPE": "Credit / Debit Card",
+      "CASH": "Cash on Delivery",
+      "BANK_TRANSFER": "Bank Transfer",
+      "SYRIATEL_CASH": "Syriatel Cash"
+    },
+    "cardDetails": "Card Details",
+    "pay": "Pay Now",
+    "success": "Payment successful!",
+    "failed": "Payment failed",
+    "uploadReceipt": "Upload Transfer Receipt"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "noNotifications": "No notifications",
+    "markAllRead": "Mark all as read",
+    "types": {
+      "NEW_BID": "New bid on your job",
+      "BID_ACCEPTED": "Your bid was accepted",
+      "BID_REJECTED": "Your bid was rejected",
+      "JOB_COMPLETED": "Job completed",
+      "NEW_MESSAGE": "New message",
+      "NEW_REVIEW": "New review",
+      "PAYMENT_RECEIVED": "Payment received"
+    }
+  },
+  "governorates": {
+    "Damascus": "Damascus",
+    "Aleppo": "Aleppo",
+    "Homs": "Homs",
+    "Hama": "Hama",
+    "Latakia": "Latakia",
+    "Deir ez-Zor": "Deir ez-Zor",
+    "Raqqa": "Raqqa",
+    "Hasakah": "Hasakah",
+    "Daraa": "Daraa",
+    "Idlib": "Idlib",
+    "Quneitra": "Quneitra",
+    "Tartus": "Tartus",
+    "As-Suwayda": "As-Suwayda",
+    "Rural Damascus": "Rural Damascus"
+  },
+  "errors": {
+    "404": "Page Not Found",
+    "500": "Server Error",
+    "unauthorized": "You are not authorized to perform this action",
+    "forbidden": "Access forbidden",
+    "goHome": "Go to Homepage"
+  },
+  "footer": {
+    "about": "About Us",
+    "contact": "Contact Us",
+    "terms": "Terms & Conditions",
+    "privacy": "Privacy Policy",
+    "copyright": "© 2024 My Hammer Syria. All rights reserved."
+  }
+}
