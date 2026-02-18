@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import {
   Button,
@@ -13,34 +14,28 @@ import {
 } from "@/components/ui";
 import { GOVERNORATES, CURRENCIES } from "@/lib/constants";
 
-const CATEGORIES = [
-  "plumbing",
-  "electrical",
-  "painting",
-  "carpentry",
-  "tiling",
-  "ac-heating",
-  "cleaning",
-  "moving",
-  "gardening",
-  "blacksmithing",
-  "aluminum",
-  "plastering",
-  "roofing",
-  "general",
-] as const;
+type Category = {
+  id: string;
+  name: string;
+  nameAr: string;
+  slug: string;
+  icon: string;
+};
 
 export default function PostJobForm() {
   const t = useTranslations("jobs.post");
   const tGov = useTranslations("governorates");
   const tCommon = useTranslations("common");
+  const locale = useLocale();
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const [categories, setCategories] = useState<Category[]>([]);
+
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("");
+  const [categoryId, setCategoryId] = useState("");
   const [description, setDescription] = useState("");
   const [governorate, setGovernorate] = useState("");
   const [address, setAddress] = useState("");
@@ -48,6 +43,15 @@ export default function PostJobForm() {
   const [budgetMax, setBudgetMax] = useState("");
   const [currency, setCurrency] = useState("SYP");
   const [deadline, setDeadline] = useState("");
+
+  useEffect(() => {
+    fetch("/api/categories")
+      .then((res) => res.json())
+      .then((data: Category[]) => setCategories(data))
+      .catch(() => {
+        // silently ignore fetch errors for categories
+      });
+  }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -60,7 +64,7 @@ export default function PostJobForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title,
-          category,
+          categoryId,
           description,
           governorate,
           address: address || undefined,
@@ -109,13 +113,13 @@ export default function PostJobForm() {
 
           <Select
             label={t("category")}
-            value={category}
-            onValueChange={setCategory}
+            value={categoryId}
+            onValueChange={setCategoryId}
             placeholder={tCommon("selectOption")}
           >
-            {CATEGORIES.map((cat) => (
-              <SelectItem key={cat} value={cat}>
-                {cat}
+            {categories.map((cat) => (
+              <SelectItem key={cat.id} value={cat.id}>
+                {locale === "ar" ? cat.nameAr : cat.name}
               </SelectItem>
             ))}
           </Select>

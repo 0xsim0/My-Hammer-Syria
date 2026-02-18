@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Badge, Card, CardContent, Button, Skeleton } from "@/components/ui";
 import { formatCurrency } from "@/lib/utils";
+import { prisma } from "@/lib/prisma";
 import MyJobsTabs from "./MyJobsTabs";
 
 export async function generateMetadata() {
@@ -21,36 +22,28 @@ async function JobsList({
   const session = await auth();
   if (!session) redirect("/login");
 
-  let jobs: Array<{
-    id: string;
-    title: string;
-    description: string;
-    status: string;
-    governorate: string;
-    budgetMin: number | null;
-    budgetMax: number | null;
-    currency: string;
-    _count?: { bids: number };
-    createdAt: string;
-  }> = [];
-
-  try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const statusParam = searchParams.status ? `&status=${searchParams.status}` : "";
-    const res = await fetch(
-      `${baseUrl}/api/jobs?customerId=me${statusParam}`,
-      {
-        headers: { cookie: `next-auth.session-token=${session.user.id}` },
-        cache: "no-store",
-      }
-    );
-    if (res.ok) {
-      const data = await res.json();
-      jobs = data.jobs || [];
-    }
-  } catch {
-    // Show empty state
+  const whereClause: {
+    customerId: string;
+    status?: "OPEN" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+  } = { customerId: session.user.id };
+  const validStatuses = ["OPEN", "IN_PROGRESS", "COMPLETED", "CANCELLED"] as const;
+  if (
+    searchParams.status &&
+    (validStatuses as readonly string[]).includes(searchParams.status)
+  ) {
+    whereClause.status = searchParams.status as typeof validStatuses[number];
   }
+
+  const jobsFromDb = await prisma.job.findMany({
+    where: whereClause,
+    include: { _count: { select: { bids: true } } },
+    orderBy: { createdAt: "desc" },
+  });
+
+  const jobs = jobsFromDb.map((job) => ({
+    ...job,
+    createdAt: job.createdAt.toISOString(),
+  }));
 
   if (jobs.length === 0) {
     return (

@@ -33,6 +33,16 @@ export async function GET(request: NextRequest) {
       ];
     }
 
+    // Filter by authenticated customer when customerId=me is passed
+    const customerId = searchParams.get("customerId");
+    if (customerId === "me") {
+      const session = await auth();
+      if (!session?.user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+      where.customerId = session.user.id;
+    }
+
     const [jobs, total] = await Promise.all([
       prisma.job.findMany({
         where,

@@ -20,6 +20,7 @@ type Role = "CUSTOMER" | "CRAFTSMAN";
 
 export default function RegisterPage() {
   const t = useTranslations("auth");
+  const tCommon = useTranslations("common");
   const tGov = useTranslations("governorates");
   const router = useRouter();
 
@@ -63,6 +64,7 @@ export default function RegisterPage() {
           name,
           email,
           password,
+          confirmPassword,
           phone: phone || undefined,
           governorate,
           role,
@@ -74,7 +76,7 @@ export default function RegisterPage() {
         if (data.error?.includes("email")) {
           setError(t("errors.emailAlreadyExists"));
         } else {
-          setError(data.error || t("../common.error"));
+          setError(data.error || tCommon("error"));
         }
         return;
       }
@@ -92,7 +94,7 @@ export default function RegisterPage() {
         router.refresh();
       }
     } catch {
-      setError(t("../common.error"));
+      setError(tCommon("error"));
     } finally {
       setLoading(false);
     }
@@ -224,7 +226,7 @@ export default function RegisterPage() {
               />
 
               <Input
-                label={`${t("phone")} (${t("../common.optional")})`}
+                label={`${t("phone")} (${tCommon("optional")})`}
                 type="tel"
                 autoComplete="tel"
                 value={phone}
@@ -235,7 +237,7 @@ export default function RegisterPage() {
                 label={t("governorate")}
                 value={governorate}
                 onValueChange={setGovernorate}
-                placeholder={t("../common.selectOption")}
+                placeholder={tCommon("selectOption")}
               >
                 {GOVERNORATES.map((gov) => (
                   <SelectItem key={gov} value={gov}>
