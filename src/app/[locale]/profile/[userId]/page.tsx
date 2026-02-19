@@ -11,61 +11,57 @@ import {
 } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
 import { formatDate } from "@/lib/utils";
-import { MapPin, Calendar, Phone } from "lucide-react";
-
-interface UserProfile {
-  id: string;
-  name: string;
-  email: string;
-  image?: string | null;
-  role: string;
-  governorate?: string | null;
-  phone?: string | null;
-  bio?: string | null;
-  businessName?: string | null;
-  yearsExperience?: number | null;
-  isAvailable?: boolean;
-  portfolio?: string[];
-  categories?: Array<{ name: string }>;
-  createdAt: string;
-  _count?: {
-    reviewsReceived: number;
-    jobs: number;
-    bids: number;
-  };
-  avgRating?: number | null;
-}
+import { MapPin, Calendar } from "lucide-react";
 
 interface Review {
   id: string;
   rating: number;
-  comment: string;
+  comment: string | null;
   createdAt: string;
-  reviewer: { name: string; image?: string | null };
+  reviewer: { id: string; name: string; nameAr?: string | null; image?: string | null };
+}
+
+interface UserProfile {
+  id: string;
+  name: string;
+  nameAr?: string | null;
+  image?: string | null;
+  role: string;
+  governorate?: string | null;
+  avgRating?: number | null;
+  totalReviews?: number | null;
+  isVerified?: boolean;
+  createdAt: string;
+  craftsmanProfile?: {
+    businessName?: string | null;
+    businessNameAr?: string | null;
+    bio?: string | null;
+    bioAr?: string | null;
+    yearsExperience?: number | null;
+    isAvailable?: boolean;
+    categories?: Array<{ id: string; name: string; nameAr: string }>;
+    portfolioItems?: Array<{ id: string; imageUrl: string }>;
+  } | null;
+  reviewsReceived?: Review[];
 }
 
 async function ProfileContent({ userId }: { userId: string }) {
   const t = await getTranslations("profile");
-  const tReviews = await getTranslations("reviews");
   const locale = await getLocale();
 
   let user: UserProfile | null = null;
-  let reviews: Review[] = [];
 
   try {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const [userRes, reviewsRes] = await Promise.all([
-      fetch(`${baseUrl}/api/users/${userId}`, { next: { revalidate: 60 } }),
-      fetch(`${baseUrl}/api/users/${userId}/reviews`, { next: { revalidate: 60 } }),
-    ]);
+    const userRes = await fetch(`${baseUrl}/api/users/${userId}`, {
+      next: { revalidate: 60 },
+    });
     if (userRes.ok) user = await userRes.json();
-    if (reviewsRes.ok) {
-      const data = await reviewsRes.json();
-      reviews = data.reviews || [];
-    }
   } catch {
     // handle
   }
+
+  const reviews: Review[] = user?.reviewsReceived ?? [];
 
   if (!user) {
     return (
@@ -81,6 +77,12 @@ async function ProfileContent({ userId }: { userId: string }) {
   }
 
   const isCraftsman = user.role === "CRAFTSMAN";
+  const profile = user.craftsmanProfile;
+  const displayName = locale === "ar" && user.nameAr ? user.nameAr : user.name;
+  const businessName = locale === "ar" && profile?.businessNameAr
+    ? profile.businessNameAr
+    : profile?.businessName;
+  const bio = locale === "ar" && profile?.bioAr ? profile.bioAr : profile?.bio;
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
@@ -88,11 +90,11 @@ async function ProfileContent({ userId }: { userId: string }) {
       <Card className="mb-6">
         <CardContent className="p-6">
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start">
-            <Avatar name={user.name} src={user.image} size="xl" />
+            <Avatar name={displayName} src={user.image} size="xl" />
             <div className="flex-1 text-center sm:text-start">
-              <h1 className="text-2xl font-bold text-gray-900">{user.name}</h1>
-              {user.businessName && (
-                <p className="text-sm text-gray-600">{user.businessName}</p>
+              <h1 className="text-2xl font-bold text-gray-900">{displayName}</h1>
+              {businessName && (
+                <p className="text-sm text-gray-600">{businessName}</p>
               )}
 
               <div className="mt-2 flex flex-wrap items-center justify-center gap-3 text-sm text-gray-500 sm:justify-start">
@@ -106,12 +108,6 @@ async function ProfileContent({ userId }: { userId: string }) {
                   <Calendar className="h-4 w-4" aria-hidden="true" />
                   {t("joinedAt")} {formatDate(user.createdAt, locale)}
                 </span>
-                {user.phone && (
-                  <span className="inline-flex items-center gap-1">
-                    <Phone className="h-4 w-4" aria-hidden="true" />
-                    {user.phone}
-                  </span>
-                )}
               </div>
 
               {isCraftsman && (
@@ -120,32 +116,34 @@ async function ProfileContent({ userId }: { userId: string }) {
                     <div className="inline-flex items-center gap-1">
                       <StarRatingDisplay rating={user.avgRating} />
                       <span className="text-sm text-gray-600">
-                        ({user._count?.reviewsReceived ?? 0})
+                        ({user.totalReviews ?? 0})
                       </span>
                     </div>
                   )}
-                  {user.yearsExperience != null && (
+                  {profile?.yearsExperience != null && (
                     <span className="text-sm text-gray-600">
-                      {user.yearsExperience} {t("yearsExperience")}
+                      {profile.yearsExperience} {t("yearsExperience")}
                     </span>
                   )}
-                  <Badge variant={user.isAvailable ? "ACCEPTED" : "default"}>
-                    {user.isAvailable ? t("isAvailable") : t("notAvailable")}
+                  <Badge variant={profile?.isAvailable ? "ACCEPTED" : "default"}>
+                    {profile?.isAvailable ? t("isAvailable") : t("notAvailable")}
                   </Badge>
                 </div>
               )}
 
-              {user.bio && (
-                <p className="mt-3 text-sm text-gray-700">{user.bio}</p>
+              {bio && (
+                <p className="mt-3 text-sm text-gray-700">{bio}</p>
               )}
             </div>
           </div>
 
           {/* Categories */}
-          {isCraftsman && user.categories && user.categories.length > 0 && (
+          {isCraftsman && profile?.categories && profile.categories.length > 0 && (
             <div className="mt-4 flex flex-wrap gap-2">
-              {user.categories.map((cat) => (
-                <Badge key={cat.name}>{cat.name}</Badge>
+              {profile.categories.map((cat) => (
+                <Badge key={cat.id}>
+                  {locale === "ar" ? cat.nameAr : cat.name}
+                </Badge>
               ))}
             </div>
           )}
@@ -153,20 +151,20 @@ async function ProfileContent({ userId }: { userId: string }) {
       </Card>
 
       {/* Portfolio */}
-      {isCraftsman && user.portfolio && user.portfolio.length > 0 && (
+      {isCraftsman && profile?.portfolioItems && profile.portfolioItems.length > 0 && (
         <section aria-labelledby="portfolio-heading" className="mb-6">
           <h2 id="portfolio-heading" className="mb-4 text-lg font-semibold text-gray-900">
             {t("portfolio")}
           </h2>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-            {user.portfolio.map((img, i) => (
+            {profile.portfolioItems.map((item, i) => (
               <div
-                key={i}
+                key={item.id}
                 className="relative aspect-square overflow-hidden rounded-lg bg-gray-100"
               >
                 <img
-                  src={img}
-                  alt={`${user.name} - ${t("portfolio")} ${i + 1}`}
+                  src={item.imageUrl}
+                  alt={`${displayName} - ${t("portfolio")} ${i + 1}`}
                   className="h-full w-full object-cover"
                   width={300}
                   height={300}
@@ -188,19 +186,24 @@ async function ProfileContent({ userId }: { userId: string }) {
           <p className="py-8 text-center text-gray-500">{t("noReviews")}</p>
         ) : (
           <div className="flex flex-col gap-4">
-            {reviews.map((review) => (
+            {reviews.map((review) => {
+            const reviewerName =
+              locale === "ar" && review.reviewer.nameAr
+                ? review.reviewer.nameAr
+                : review.reviewer.name;
+            return (
               <Card key={review.id}>
                 <CardContent className="p-5">
                   <div className="flex items-start gap-3">
                     <Avatar
-                      name={review.reviewer.name}
+                      name={reviewerName}
                       src={review.reviewer.image}
                       size="sm"
                     />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between">
                         <p className="font-medium text-gray-900">
-                          {review.reviewer.name}
+                          {reviewerName}
                         </p>
                         <span className="text-xs text-gray-500">
                           {formatDate(review.createdAt, locale)}
@@ -216,7 +219,8 @@ async function ProfileContent({ userId }: { userId: string }) {
                   </div>
                 </CardContent>
               </Card>
-            ))}
+            );
+          })}
           </div>
         )}
       </section>

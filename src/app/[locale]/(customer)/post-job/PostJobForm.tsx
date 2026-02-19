@@ -77,7 +77,12 @@ export default function PostJobForm() {
 
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error || tCommon("error"));
+        if (data.details?.fieldErrors) {
+          const firstError = Object.values(data.details.fieldErrors as Record<string, string[]>).flat()[0];
+          setError(firstError || data.error || tCommon("error"));
+        } else {
+          setError(data.error || tCommon("error"));
+        }
         return;
       }
 

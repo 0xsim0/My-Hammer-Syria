@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { createBidSchema } from "@/lib/validations/bid";
-import { pusherServer, PUSHER_EVENTS, getUserChannel } from "@/lib/pusher";
+import { safeTrigger, PUSHER_EVENTS, getUserChannel } from "@/lib/pusher";
 
 type RouteParams = { params: Promise<{ jobId: string }> };
 
@@ -126,7 +126,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    await pusherServer.trigger(
+    await safeTrigger(
       getUserChannel(job.customerId),
       PUSHER_EVENTS.NEW_NOTIFICATION,
       { type: "NEW_BID", jobId }

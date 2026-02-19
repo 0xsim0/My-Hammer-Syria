@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { z } from "zod";
-import { pusherServer, PUSHER_EVENTS, getConversationChannel, getUserChannel } from "@/lib/pusher";
+import { safeTrigger, PUSHER_EVENTS, getConversationChannel, getUserChannel } from "@/lib/pusher";
 
 type RouteParams = { params: Promise<{ conversationId: string }> };
 
@@ -19,35 +19,69 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     const { conversationId } = await params;
 
-    const participant = await prisma.conversationParticipant.findUnique({
-      where: {
-        conversationId_userId: {
-          conversationId,
-          userId: session.user.id,
+    const conversation = await prisma.conversation.findUnique({
+      where: { id: conversationId },
+      include: {
+        job: {
+          select: { id: true, title: true, titleAr: true },
+        },
+        participants: {
+          include: {
+            user: {
+              select: { id: true, name: true, nameAr: true, image: true },
+            },
+          },
+        },
+        messages: {
+          include: {
+            sender: {
+              select: { id: true, name: true, image: true },
+            },
+          },
+          orderBy: { createdAt: "asc" },
+          take: 100,
         },
       },
     });
 
-    if (!participant) {
+    if (!conversation) {
+      return NextResponse.json({ error: "Conversation not found" }, { status: 404 });
+    }
+
+    // Verify the user is a participant
+    const isParticipant = conversation.participants.some(
+      (p) => p.userId === session.user.id
+    );
+    if (!isParticipant) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const messages = await prisma.message.findMany({
-      where: { conversationId },
-      include: {
-        sender: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-          },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-      take: 50,
-    });
+    // Find the other user
+    const otherParticipant = conversation.participants.find(
+      (p) => p.userId !== session.user.id
+    );
 
-    return NextResponse.json({ messages });
+    const result = {
+      id: conversation.id,
+      otherUser: otherParticipant
+        ? {
+            id: otherParticipant.user.id,
+            name: otherParticipant.user.name,
+            image: otherParticipant.user.image,
+          }
+        : { id: "", name: "Unknown", image: null },
+      job: conversation.job
+        ? { id: conversation.job.id, title: conversation.job.title }
+        : null,
+      messages: conversation.messages.map((msg) => ({
+        id: msg.id,
+        content: msg.content,
+        senderId: msg.senderId,
+        createdAt: msg.createdAt.toISOString(),
+      })),
+    };
+
+    return NextResponse.json(result);
   } catch (error) {
     if (process.env.NODE_ENV === "development") console.error(error);
     return NextResponse.json(
@@ -111,7 +145,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       data: { updatedAt: new Date() },
     });
 
-    await pusherServer.trigger(
+    await safeTrigger(
       getConversationChannel(conversationId),
       PUSHER_EVENTS.NEW_MESSAGE,
       message
@@ -135,7 +169,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         },
       });
 
-      await pusherServer.trigger(
+      await safeTrigger(
         getUserChannel(p.userId),
         PUSHER_EVENTS.NEW_NOTIFICATION,
         { type: "NEW_MESSAGE", conversationId }

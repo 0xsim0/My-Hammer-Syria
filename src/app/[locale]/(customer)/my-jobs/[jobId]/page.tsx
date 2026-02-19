@@ -51,7 +51,7 @@ interface Job {
 export default function JobManagePage({
   params,
 }: {
-  params: Promise<{ jobId: string; locale: string }>;
+  params: { jobId: string; locale: string };
 }) {
   const t = useTranslations("jobs");
   const tBids = useTranslations("bids");
@@ -60,20 +60,18 @@ export default function JobManagePage({
   const tNav = useTranslations("nav");
   const router = useRouter();
 
+  const jobId = params.jobId;
+
   const [job, setJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [showReview, setShowReview] = useState(false);
   const [rating, setRating] = useState(0);
   const [reviewComment, setReviewComment] = useState("");
-  const [jobId, setJobId] = useState<string>("");
 
   useEffect(() => {
-    params.then((p) => {
-      setJobId(p.jobId);
-      fetchJob(p.jobId);
-    });
-  }, [params]);
+    fetchJob(jobId);
+  }, [jobId]);
 
   async function fetchJob(id: string) {
     try {

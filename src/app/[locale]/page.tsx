@@ -3,55 +3,28 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Badge, Card, CardContent, Skeleton } from "@/components/ui";
 
-const SERVICE_CATEGORIES = [
-  { key: "plumbing", emoji: "🔧", slug: "plumbing" },
-  { key: "electrical", emoji: "⚡", slug: "electrical" },
-  { key: "painting", emoji: "🎨", slug: "painting" },
-  { key: "carpentry", emoji: "🪚", slug: "carpentry" },
-  { key: "tiling", emoji: "🧱", slug: "tiling" },
-  { key: "ac_heating", emoji: "❄️", slug: "ac-heating" },
-  { key: "cleaning", emoji: "🧹", slug: "cleaning" },
-  { key: "moving", emoji: "🚚", slug: "moving" },
-  { key: "gardening", emoji: "🌿", slug: "gardening" },
-  { key: "blacksmithing", emoji: "🔨", slug: "blacksmithing" },
-  { key: "aluminum", emoji: "🪟", slug: "aluminum" },
-  { key: "plastering", emoji: "🏗️", slug: "plastering" },
-  { key: "roofing", emoji: "🏠", slug: "roofing" },
-  { key: "general", emoji: "🛠️", slug: "general" },
-] as const;
-
-const CATEGORY_NAMES_AR: Record<string, string> = {
-  plumbing: "سباكة",
-  electrical: "كهرباء",
-  painting: "دهان",
-  carpentry: "نجارة",
-  tiling: "بلاط وسيراميك",
-  ac_heating: "تكييف وتدفئة",
-  cleaning: "تنظيف",
-  moving: "نقل أثاث",
-  gardening: "حدائق",
-  blacksmithing: "حدادة",
-  aluminum: "ألمنيوم",
-  plastering: "جبس وقصارة",
-  roofing: "عزل وأسقف",
-  general: "أعمال عامة",
-};
-
-const CATEGORY_NAMES_EN: Record<string, string> = {
-  plumbing: "Plumbing",
-  electrical: "Electrical",
-  painting: "Painting",
-  carpentry: "Carpentry",
-  tiling: "Tiling & Ceramics",
-  ac_heating: "AC & Heating",
-  cleaning: "Cleaning",
-  moving: "Moving",
-  gardening: "Gardening",
-  blacksmithing: "Blacksmithing",
-  aluminum: "Aluminum & Glass",
-  plastering: "Plastering",
-  roofing: "Roofing & Insulation",
-  general: "General Work",
+// Emoji map keyed by category slug (covers both seed slugs and legacy slugs)
+const CATEGORY_EMOJI: Record<string, string> = {
+  plumbing: "🔧",
+  electrical: "⚡",
+  carpentry: "🪚",
+  painting: "🎨",
+  tiling: "🧱",
+  hvac: "❄️",
+  "ac-heating": "❄️",
+  masonry: "🏗️",
+  welding: "🔩",
+  cleaning: "🧹",
+  moving: "🚚",
+  garden: "🌿",
+  gardening: "🌿",
+  roofing: "🏠",
+  appliance: "🔌",
+  security: "🔐",
+  blacksmithing: "🔨",
+  aluminum: "🪟",
+  plastering: "🏗️",
+  general: "🛠️",
 };
 
 async function FeaturedJobs() {
@@ -146,11 +119,60 @@ export async function generateMetadata() {
   };
 }
 
+async function ServiceCategories({ locale }: { locale: string }) {
+  let categories: Array<{
+    id: string;
+    slug: string;
+    name: string;
+    nameAr: string;
+    icon?: string | null;
+  }> = [];
+
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const res = await fetch(`${baseUrl}/api/categories`, {
+      next: { revalidate: 3600 },
+    });
+    if (res.ok) {
+      categories = await res.json();
+    }
+  } catch {
+    // Silently fail
+  }
+
+  if (categories.length === 0) return null;
+
+  return (
+    <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
+      {categories.map((cat) => {
+        const emoji = cat.icon || CATEGORY_EMOJI[cat.slug] || "🛠️";
+        const label = locale === "ar" ? cat.nameAr : cat.name;
+        return (
+          <Link
+            key={cat.slug}
+            href={`/find-jobs?category=${cat.slug}`}
+            className="group flex flex-col items-center gap-2 rounded-xl border border-gray-200 bg-white p-4 transition-all hover:border-primary-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 touch-manipulation"
+          >
+            <span
+              className="text-3xl transition-transform group-hover:scale-110"
+              role="img"
+              aria-hidden="true"
+            >
+              {emoji}
+            </span>
+            <span className="text-center text-xs font-medium text-gray-700 group-hover:text-primary-700">
+              {label}
+            </span>
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
 export default async function LandingPage() {
   const t = await getTranslations("landing");
   const locale = await getLocale();
-  const isRTL = locale === "ar";
-  const categoryNames = isRTL ? CATEGORY_NAMES_AR : CATEGORY_NAMES_EN;
 
   return (
     <div className="flex flex-col">
@@ -272,26 +294,17 @@ export default async function LandingPage() {
             {t("categories.title")}
           </h2>
 
-          <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
-            {SERVICE_CATEGORIES.map((cat) => (
-              <Link
-                key={cat.slug}
-                href={`/find-jobs?category=${cat.slug}`}
-                className="group flex flex-col items-center gap-2 rounded-xl border border-gray-200 bg-white p-4 transition-all hover:border-primary-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 touch-manipulation"
-              >
-                <span
-                  className="text-3xl transition-transform group-hover:scale-110"
-                  role="img"
-                  aria-hidden="true"
-                >
-                  {cat.emoji}
-                </span>
-                <span className="text-center text-xs font-medium text-gray-700 group-hover:text-primary-700">
-                  {categoryNames[cat.key]}
-                </span>
-              </Link>
-            ))}
-          </div>
+          <Suspense
+            fallback={
+              <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
+                {Array.from({ length: 14 }).map((_, i) => (
+                  <Skeleton key={i} variant="card" className="h-20" />
+                ))}
+              </div>
+            }
+          >
+            <ServiceCategories locale={locale} />
+          </Suspense>
         </div>
       </section>
 

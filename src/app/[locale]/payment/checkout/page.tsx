@@ -43,14 +43,13 @@ export default function CheckoutPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/payments", {
+      const res = await fetch("/api/payments/create-intent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           jobId,
           amount,
-          currency,
-          method,
+          currency: currency.toLowerCase() as "usd" | "syp",
         }),
       });
 

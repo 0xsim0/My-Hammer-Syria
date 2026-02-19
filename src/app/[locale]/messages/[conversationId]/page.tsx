@@ -27,27 +27,24 @@ interface ConversationData {
 export default function ChatPage({
   params,
 }: {
-  params: Promise<{ conversationId: string }>;
+  params: { conversationId: string };
 }) {
   const t = useTranslations("chat");
+  const convId = params.conversationId;
   const [conv, setConv] = useState<ConversationData | null>(null);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string>("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [convId, setConvId] = useState<string>("");
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
   useEffect(() => {
-    params.then((p) => {
-      setConvId(p.conversationId);
-      fetchConversation(p.conversationId);
-    });
-  }, [params]);
+    fetchConversation(convId);
+  }, [convId]);
 
   useEffect(() => {
     scrollToBottom();
@@ -56,7 +53,7 @@ export default function ChatPage({
   async function fetchConversation(id: string) {
     try {
       const [convRes, sessionRes] = await Promise.all([
-        fetch(`/api/conversations/${id}`),
+        fetch(`/api/messages/${id}`),
         fetch("/api/auth/session"),
       ]);
       if (convRes.ok) {
@@ -80,7 +77,7 @@ export default function ChatPage({
 
     setSending(true);
     try {
-      const res = await fetch(`/api/conversations/${convId}/messages`, {
+      const res = await fetch(`/api/messages/${convId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: message }),

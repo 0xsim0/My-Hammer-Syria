@@ -23,7 +23,7 @@ export default function MobileNav() {
   const items: NavItem[] = [
     { href: "/", label: t("home"), icon: Home },
     {
-      href: role === "CUSTOMER" ? "/my-jobs" : "/jobs",
+      href: role === "CUSTOMER" ? "/my-jobs" : "/find-jobs",
       label: role === "CUSTOMER" ? t("myJobs") : t("findJobs"),
       icon: Briefcase,
     },

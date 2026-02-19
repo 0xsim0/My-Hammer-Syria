@@ -34,7 +34,7 @@ export default function Navbar() {
     if (!session) {
       return [
         { href: "/", label: t("home") },
-        { href: "/jobs", label: t("findJobs") },
+        { href: "/find-jobs", label: t("findJobs") },
         { href: "/login", label: t("login") },
         { href: "/register", label: t("register") },
       ];
@@ -50,7 +50,7 @@ export default function Navbar() {
       );
     } else if (role === "CRAFTSMAN") {
       links.push(
-        { href: "/jobs", label: t("findJobs") },
+        { href: "/find-jobs", label: t("findJobs") },
         { href: "/my-bids", label: t("myBids") },
         { href: "/messages", label: t("messages") }
       );

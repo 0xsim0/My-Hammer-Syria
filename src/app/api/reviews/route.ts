@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { z } from "zod";
-import { pusherServer, PUSHER_EVENTS, getUserChannel } from "@/lib/pusher";
+import { safeTrigger, PUSHER_EVENTS, getUserChannel } from "@/lib/pusher";
 
 const createReviewSchema = z.object({
   jobId: z.string().min(1),
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    await pusherServer.trigger(
+    await safeTrigger(
       getUserChannel(revieweeId),
       PUSHER_EVENTS.NEW_NOTIFICATION,
       { type: "NEW_REVIEW", jobId }

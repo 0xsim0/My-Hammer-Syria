@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { updateBidStatusSchema } from "@/lib/validations/bid";
-import { pusherServer, PUSHER_EVENTS, getUserChannel } from "@/lib/pusher";
+import { safeTrigger, PUSHER_EVENTS, getUserChannel } from "@/lib/pusher";
 
 type RouteParams = { params: Promise<{ jobId: string; bidId: string }> };
 
@@ -91,7 +91,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         }),
       ]);
 
-      await pusherServer.trigger(
+      await safeTrigger(
         getUserChannel(bid.craftsmanId),
         PUSHER_EVENTS.NEW_NOTIFICATION,
         { type: "BID_ACCEPTED", jobId }
@@ -116,7 +116,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         },
       });
 
-      await pusherServer.trigger(
+      await safeTrigger(
         getUserChannel(bid.craftsmanId),
         PUSHER_EVENTS.NEW_NOTIFICATION,
         { type: "BID_REJECTED", jobId }

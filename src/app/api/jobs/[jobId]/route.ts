@@ -9,9 +9,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const { jobId } = await params;
 
-    const job = await prisma.job.update({
+    const job = await prisma.job.findUnique({
       where: { id: jobId },
-      data: { viewCount: { increment: 1 } },
       include: {
         category: true,
         customer: {
@@ -42,6 +41,15 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       },
     });
 
+    if (!job) {
+      return NextResponse.json({ error: "Job not found" }, { status: 404 });
+    }
+
+    // Increment view count in the background (non-blocking)
+    prisma.job
+      .update({ where: { id: jobId }, data: { viewCount: { increment: 1 } } })
+      .catch(() => {});
+
     // Parse images from JSON string to array for clients
     const parsed = {
       ...job,
@@ -51,7 +59,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json(parsed);
   } catch (error) {
     if (process.env.NODE_ENV === "development") console.error(error);
-    return NextResponse.json({ error: "Job not found" }, { status: 404 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 

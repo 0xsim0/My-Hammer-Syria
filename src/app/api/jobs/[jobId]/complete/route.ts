@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-import { pusherServer, PUSHER_EVENTS, getUserChannel } from "@/lib/pusher";
+import { safeTrigger, PUSHER_EVENTS, getUserChannel } from "@/lib/pusher";
 
 type RouteParams = { params: Promise<{ jobId: string }> };
 
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         },
       });
 
-      await pusherServer.trigger(
+      await safeTrigger(
         getUserChannel(acceptedBid.craftsmanId),
         PUSHER_EVENTS.NEW_NOTIFICATION,
         { type: "JOB_COMPLETED", jobId }
