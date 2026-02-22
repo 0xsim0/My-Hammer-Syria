@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { pusherServer } from "@/lib/pusher";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,12 +22,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Only allow users to authenticate their own private channels
-    // private-conversation-X: user must be a participant (Pusher just checks auth)
-    // private-user-X: user must match their own userId
+    // Verify channel ownership before authenticating
     if (channelName.startsWith("private-user-")) {
       const channelUserId = channelName.replace("private-user-", "");
       if (channelUserId !== session.user.id) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+    } else if (channelName.startsWith("private-conversation-")) {
+      const conversationId = channelName.replace("private-conversation-", "");
+      const participant = await prisma.conversationParticipant.findFirst({
+        where: { conversationId, userId: session.user.id },
+      });
+      if (!participant) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
     }

@@ -52,7 +52,7 @@ export default function MyBidsPage() {
       : bids.filter((b) => b.status === activeTab);
 
   const tabs = [
-    { key: "all", label: "All" },
+    { key: "all", label: t("all") },
     ...BID_STATUSES.map((s) => ({ key: s, label: t(`status.${s}`) })),
   ];
 
@@ -120,7 +120,7 @@ export default function MyBidsPage() {
                       {formatCurrency(bid.price, bid.currency)}
                     </span>
                     <span>
-                      {bid.estimatedDays} {bid.estimatedDays === 1 ? "day" : "days"}
+                      {bid.estimatedDays} {bid.estimatedDays === 1 ? t("day") : t("days")}
                     </span>
                     <span>{formatDate(bid.createdAt)}</span>
                   </div>

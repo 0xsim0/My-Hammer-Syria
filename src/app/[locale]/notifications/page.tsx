@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Button, Skeleton } from "@/components/ui";
 import { Bell, CheckCheck } from "lucide-react";
@@ -37,12 +37,11 @@ function timeAgo(dateStr: string, locale: string): string {
 
 export default function NotificationsPage() {
   const t = useTranslations("notifications");
+  const locale = useLocale();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
-  const [locale, setLocale] = useState("ar");
 
   useEffect(() => {
-    setLocale(document.documentElement.lang || "ar");
     fetchNotifications();
   }, []);
 

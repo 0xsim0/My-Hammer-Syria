@@ -78,6 +78,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         content: msg.content,
         senderId: msg.senderId,
         createdAt: msg.createdAt.toISOString(),
+        sender: msg.sender,
       })),
     };
 

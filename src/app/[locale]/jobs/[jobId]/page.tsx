@@ -41,6 +41,7 @@ async function JobDetail({ jobId }: { jobId: string }) {
   const t = await getTranslations("jobs");
   const tBids = await getTranslations("bids");
   const tAuth = await getTranslations("auth");
+  const tDetail = await getTranslations("jobDetail");
   const locale = await getLocale();
   const session = await auth();
 
@@ -60,7 +61,7 @@ async function JobDetail({ jobId }: { jobId: string }) {
   if (!job) {
     return (
       <div className="flex flex-col items-center gap-4 py-16 text-center">
-        <p className="text-gray-500">Job not found</p>
+        <p className="text-gray-500">{tDetail("notFound")}</p>
         <Button asChild variant="outline">
           <Link href="/find-jobs">{t("list.title")}</Link>
         </Button>
@@ -144,9 +145,7 @@ async function JobDetail({ jobId }: { jobId: string }) {
               <Card>
                 <CardContent className="flex flex-col items-center gap-3 p-6 text-center">
                   <p className="text-gray-600">
-                    {locale === "ar"
-                      ? "سجل الدخول كحرفي لتقديم عرض"
-                      : "Login as a craftsman to place a bid"}
+                    {tDetail("loginToBid")}
                   </p>
                   <Button asChild>
                     <Link href="/login">{tAuth("login")}</Link>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Button, Card, CardContent, Input } from "@/components/ui";
 import { GOVERNORATES } from "@/lib/constants";
@@ -22,12 +22,28 @@ interface UserData {
     bioAr?: string | null;
     yearsExperience?: number | null;
     isAvailable?: boolean;
+    categories?: { id: string }[];
   } | null;
+}
+
+interface Category {
+  id: string;
+  name: string;
+  nameAr: string;
+  slug: string;
+}
+
+interface PortfolioItem {
+  id: string;
+  imageUrl: string;
+  title?: string | null;
 }
 
 export default function EditProfilePage() {
   const t = useTranslations("profile");
   const tCommon = useTranslations("common");
+  const tEdit = useTranslations("profileEdit");
+  const locale = useLocale();
   const router = useRouter();
 
   const [user, setUser] = useState<UserData | null>(null);
@@ -47,10 +63,74 @@ export default function EditProfilePage() {
   const [bioAr, setBioAr] = useState("");
   const [yearsExperience, setYearsExperience] = useState("");
   const [isAvailable, setIsAvailable] = useState(false);
+  const isRTL = locale === "ar";
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
+  const [uploadingPortfolio, setUploadingPortfolio] = useState(false);
 
   useEffect(() => {
     fetchUser();
+    fetchCategories();
   }, []);
+
+  async function fetchCategories() {
+    try {
+      const res = await fetch("/api/categories");
+      if (res.ok) {
+        const data = await res.json();
+        setCategories(Array.isArray(data) ? data : []);
+      }
+    } catch {
+      // handle silently
+    }
+  }
+
+  function toggleCategory(id: string) {
+    setSelectedCategoryIds((prev) =>
+      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
+    );
+  }
+
+  async function handlePortfolioUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingPortfolio(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const uploadRes = await fetch("/api/upload", { method: "POST", body: formData });
+      if (!uploadRes.ok) {
+        toast.error(tEdit("uploadFailed"));
+        return;
+      }
+      const { url } = await uploadRes.json();
+      const portfolioRes = await fetch("/api/portfolio", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imageUrl: url }),
+      });
+      if (portfolioRes.ok) {
+        const newItem = await portfolioRes.json();
+        setPortfolioItems((prev) => [...prev, newItem]);
+        toast.success(tEdit("imageAdded"));
+      }
+    } catch {
+      toast.error(tEdit("uploadFailed"));
+    } finally {
+      setUploadingPortfolio(false);
+      e.target.value = "";
+    }
+  }
+
+  async function handlePortfolioDelete(id: string) {
+    try {
+      await fetch(`/api/portfolio/${id}`, { method: "DELETE" });
+      setPortfolioItems((prev) => prev.filter((item) => item.id !== id));
+    } catch {
+      // handle silently
+    }
+  }
 
   async function fetchUser() {
     try {
@@ -72,6 +152,14 @@ export default function EditProfilePage() {
             data.craftsmanProfile.yearsExperience?.toString() || ""
           );
           setIsAvailable(data.craftsmanProfile.isAvailable ?? true);
+          setSelectedCategoryIds(
+            (data.craftsmanProfile.categories || []).map((c) => c.id)
+          );
+          // Load portfolio
+          fetch("/api/portfolio")
+            .then((r) => r.json())
+            .then((d) => setPortfolioItems(d.portfolioItems || []))
+            .catch(() => {});
         }
       } else if (res.status === 401) {
         router.push("/login");
@@ -106,6 +194,7 @@ export default function EditProfilePage() {
             ? parseInt(yearsExperience, 10)
             : undefined,
           isAvailable,
+          categoryIds: selectedCategoryIds,
         };
       }
 
@@ -116,11 +205,7 @@ export default function EditProfilePage() {
       });
 
       if (res.ok) {
-        toast.success(
-          document.documentElement.lang === "ar"
-            ? "تم حفظ الملف الشخصي بنجاح"
-            : "Profile saved successfully"
-        );
+        toast.success(tEdit("profileSaved"));
         router.push(`/profile/${user?.id}`);
       } else {
         const data = await res.json();
@@ -143,8 +228,6 @@ export default function EditProfilePage() {
 
   if (!user) return null;
 
-  const isRTL = document.documentElement.dir === "rtl";
-
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
       <h1 className="mb-6 text-2xl font-bold text-gray-900">{t("edit")}</h1>
@@ -154,18 +237,18 @@ export default function EditProfilePage() {
         <Card>
           <CardContent className="flex flex-col gap-4 p-6">
             <h2 className="text-lg font-semibold text-gray-900">
-              {isRTL ? "المعلومات الأساسية" : "Basic Information"}
+              {tEdit("basicInfo")}
             </h2>
 
             <Input
-              label={isRTL ? "الاسم (بالإنجليزية)" : "Name (English)"}
+              label={tEdit("nameEnglish")}
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Ahmad Al-Hassan"
             />
 
             <Input
-              label={isRTL ? "الاسم (بالعربية)" : "Name (Arabic)"}
+              label={tEdit("nameArabic")}
               value={nameAr}
               onChange={(e) => setNameAr(e.target.value)}
               placeholder="أحمد الحسن"
@@ -173,7 +256,7 @@ export default function EditProfilePage() {
             />
 
             <Input
-              label={isRTL ? "رقم الهاتف" : "Phone Number"}
+              label={tEdit("phoneNumber")}
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               type="tel"
@@ -182,7 +265,7 @@ export default function EditProfilePage() {
 
             <div>
               <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                {isRTL ? "المحافظة" : "Governorate"}
+                {tEdit("governorate")}
               </label>
               <select
                 value={governorate}
@@ -190,7 +273,7 @@ export default function EditProfilePage() {
                 className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
               >
                 <option value="">
-                  {isRTL ? "اختر المحافظة" : "Select Governorate"}
+                  {tEdit("selectGovernorate")}
                 </option>
                 {GOVERNORATES.map((g) => (
                   <option key={g} value={g}>
@@ -201,7 +284,7 @@ export default function EditProfilePage() {
             </div>
 
             <Input
-              label={isRTL ? "رابط الصورة الشخصية" : "Profile Image URL"}
+              label={tEdit("profileImageUrl")}
               value={image}
               onChange={(e) => setImage(e.target.value)}
               type="url"
@@ -215,17 +298,17 @@ export default function EditProfilePage() {
           <Card>
             <CardContent className="flex flex-col gap-4 p-6">
               <h2 className="text-lg font-semibold text-gray-900">
-                {isRTL ? "الملف المهني" : "Professional Profile"}
+                {tEdit("professionalProfile")}
               </h2>
 
               <Input
-                label={isRTL ? "اسم النشاط التجاري (إنجليزي)" : "Business Name (English)"}
+                label={tEdit("businessNameEnglish")}
                 value={businessName}
                 onChange={(e) => setBusinessName(e.target.value)}
               />
 
               <Input
-                label={isRTL ? "اسم النشاط التجاري (عربي)" : "Business Name (Arabic)"}
+                label={tEdit("businessNameArabic")}
                 value={businessNameAr}
                 onChange={(e) => setBusinessNameAr(e.target.value)}
                 dir="rtl"
@@ -233,7 +316,7 @@ export default function EditProfilePage() {
 
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                  {isRTL ? "نبذة عنك (إنجليزي)" : "Bio (English)"}
+                  {tEdit("bioEnglish")}
                 </label>
                 <textarea
                   value={bio}
@@ -245,7 +328,7 @@ export default function EditProfilePage() {
 
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                  {isRTL ? "نبذة عنك (عربي)" : "Bio (Arabic)"}
+                  {tEdit("bioArabic")}
                 </label>
                 <textarea
                   value={bioAr}
@@ -257,7 +340,7 @@ export default function EditProfilePage() {
               </div>
 
               <Input
-                label={isRTL ? "سنوات الخبرة" : "Years of Experience"}
+                label={tEdit("yearsOfExperience")}
                 value={yearsExperience}
                 onChange={(e) => setYearsExperience(e.target.value)}
                 type="number"
@@ -280,6 +363,73 @@ export default function EditProfilePage() {
                   {t("isAvailable")}
                 </label>
               </div>
+
+              {categories.length > 0 && (
+                <div>
+                  <p className="mb-2 text-sm font-medium text-gray-700">
+                    {tEdit("specializations")}
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {categories.map((cat) => (
+                      <label key={cat.id} className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 p-2 hover:bg-gray-50">
+                        <input
+                          type="checkbox"
+                          checked={selectedCategoryIds.includes(cat.id)}
+                          onChange={() => toggleCategory(cat.id)}
+                          className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                        />
+                        <span className="text-sm text-gray-700">
+                          {isRTL ? cat.nameAr : cat.name}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Portfolio */}
+        {user.role === "CRAFTSMAN" && (
+          <Card>
+            <CardContent className="flex flex-col gap-4 p-6">
+              <h2 className="text-lg font-semibold text-gray-900">
+                {tEdit("portfolio")}
+              </h2>
+              {portfolioItems.length > 0 && (
+                <div className="grid grid-cols-3 gap-3">
+                  {portfolioItems.map((item) => (
+                    <div key={item.id} className="group relative aspect-square overflow-hidden rounded-lg border border-gray-200">
+                      <img
+                        src={item.imageUrl}
+                        alt={item.title || "Portfolio item"}
+                        className="h-full w-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handlePortfolioDelete(item.id)}
+                        className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                        aria-label="Delete"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <label className="flex cursor-pointer items-center gap-2 rounded-lg border-2 border-dashed border-gray-300 px-4 py-3 text-sm text-gray-600 hover:border-primary-400 hover:text-primary-600">
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handlePortfolioUpload}
+                  disabled={uploadingPortfolio}
+                />
+                {uploadingPortfolio
+                  ? tEdit("uploading")
+                  : tEdit("addImage")}
+              </label>
             </CardContent>
           </Card>
         )}

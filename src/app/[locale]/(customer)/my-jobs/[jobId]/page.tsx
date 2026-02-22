@@ -45,7 +45,7 @@ interface Job {
   category?: { name: string } | null;
   bids: Bid[];
   review?: { id: string } | null;
-  conversationId?: string | null;
+  conversation?: { id: string } | null;
 }
 
 export default function JobManagePage({
@@ -217,9 +217,9 @@ export default function JobManagePage({
                 {t("complete.button")}
               </Button>
             )}
-            {job.conversationId && (
+            {job.conversation?.id && (
               <Button asChild variant="outline">
-                <Link href={`/messages/${job.conversationId}`}>
+                <Link href={`/messages/${job.conversation.id}`}>
                   <MessageCircle className="h-4 w-4" aria-hidden="true" />
                   {tNav("messages")}
                 </Link>

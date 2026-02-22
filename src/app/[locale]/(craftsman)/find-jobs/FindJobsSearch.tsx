@@ -1,8 +1,8 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Button,
   Input,
@@ -13,6 +13,12 @@ import {
 } from "@/components/ui";
 import { GOVERNORATES } from "@/lib/constants";
 import { Search } from "lucide-react";
+
+interface Category {
+  id: string;
+  name: string;
+  nameAr: string;
+}
 
 export default function FindJobsSearch({
   currentCategory,
@@ -26,23 +32,32 @@ export default function FindJobsSearch({
   const t = useTranslations("jobs.list.filter");
   const tCommon = useTranslations("common");
   const tGov = useTranslations("governorates");
+  const locale = useLocale();
   const router = useRouter();
 
   const [search, setSearch] = useState(currentSearch || "");
-  const [category, setCategory] = useState(currentCategory || "");
+  const [categoryId, setCategoryId] = useState(currentCategory || "");
   const [governorate, setGovernorate] = useState(currentGovernorate || "");
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    fetch("/api/categories")
+      .then((res) => res.json())
+      .then((data) => setCategories(Array.isArray(data) ? data : []))
+      .catch(() => {});
+  }, []);
 
   function applyFilters() {
     const params = new URLSearchParams();
     if (search) params.set("search", search);
-    if (category) params.set("category", category);
+    if (categoryId) params.set("categoryId", categoryId);
     if (governorate) params.set("governorate", governorate);
     router.push(`/find-jobs?${params.toString()}`);
   }
 
   function clearFilters() {
     setSearch("");
-    setCategory("");
+    setCategoryId("");
     setGovernorate("");
     router.push("/find-jobs");
   }
@@ -66,6 +81,21 @@ export default function FindJobsSearch({
             <Search className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
+
+        {categories.length > 0 && (
+          <Select
+            label={t("category")}
+            value={categoryId}
+            onValueChange={setCategoryId}
+            placeholder={tCommon("selectOption")}
+          >
+            {categories.map((cat) => (
+              <SelectItem key={cat.id} value={cat.id}>
+                {locale === "ar" ? cat.nameAr : cat.name}
+              </SelectItem>
+            ))}
+          </Select>
+        )}
 
         <Select
           label={t("governorate")}

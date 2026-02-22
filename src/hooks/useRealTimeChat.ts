@@ -9,7 +9,7 @@ export interface Message {
   imageUrl?: string | null;
   senderId: string;
   createdAt: string;
-  sender: {
+  sender?: {
     id: string;
     name: string | null;
     image: string | null;
@@ -41,20 +41,30 @@ export function useRealTimeChat(conversationId: string, userId: string) {
   useEffect(() => {
     fetchMessages();
 
-    const pusher = getPusherClient();
-    const channel = pusher.subscribe(getConversationChannel(conversationId));
+    let channel: ReturnType<typeof getPusherClient>["channels"]["channels"][string] | null = null;
+    let pusher: ReturnType<typeof getPusherClient> | null = null;
 
-    channel.bind(PUSHER_EVENTS.NEW_MESSAGE, (newMessage: Message) => {
-      setMessages((prev) => {
-        // Avoid duplicates
-        if (prev.some((m) => m.id === newMessage.id)) return prev;
-        return [...prev, newMessage];
+    try {
+      pusher = getPusherClient();
+      channel = pusher.subscribe(getConversationChannel(conversationId));
+
+      channel.bind(PUSHER_EVENTS.NEW_MESSAGE, (newMessage: Message) => {
+        setMessages((prev) => {
+          if (prev.some((m) => m.id === newMessage.id)) return prev;
+          return [...prev, newMessage];
+        });
       });
-    });
+    } catch {
+      // Pusher not configured — real-time updates disabled, polling still works
+    }
 
     return () => {
-      channel.unbind_all();
-      pusher.unsubscribe(getConversationChannel(conversationId));
+      try {
+        if (channel) channel.unbind_all();
+        if (pusher) pusher.unsubscribe(getConversationChannel(conversationId));
+      } catch {
+        // ignore cleanup errors
+      }
     };
   }, [conversationId, fetchMessages]);
 
@@ -70,7 +80,12 @@ export function useRealTimeChat(conversationId: string, userId: string) {
           body: JSON.stringify({ content, imageUrl }),
         });
         if (!res.ok) throw new Error("Failed to send message");
-        // Message will come back via Pusher
+        const sent = await res.json();
+        // Add immediately — Pusher duplicate guard will prevent double-add
+        setMessages((prev) => {
+          if (prev.some((m) => m.id === sent.id)) return prev;
+          return [...prev, sent];
+        });
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to send");
         throw err;

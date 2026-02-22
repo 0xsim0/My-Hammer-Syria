@@ -31,6 +31,7 @@
   "nav": {
     "home": "Home",
     "findJobs": "Find Jobs",
+    "findCraftsmen": "Find Craftsmen",
     "postJob": "Post a Job",
     "myJobs": "My Jobs",
     "myBids": "My Bids",
@@ -42,7 +43,8 @@
     "logout": "Logout",
     "admin": "Admin Panel",
     "switchToCustomer": "Switch to Customer",
-    "switchToCraftsman": "Switch to Craftsman"
+    "switchToCraftsman": "Switch to Craftsman",
+    "settings": "Settings"
   },
   "auth": {
     "login": "Login",
@@ -58,6 +60,7 @@
     "craftsman": "Craftsman (Offering services)",
     "governorate": "Governorate",
     "forgotPassword": "Forgot password?",
+    "backToLogin": "Back to login",
     "alreadyHaveAccount": "Already have an account?",
     "dontHaveAccount": "Don't have an account?",
     "loginHere": "Login here",
@@ -68,7 +71,8 @@
       "passwordsDoNotMatch": "Passwords do not match",
       "emailAlreadyExists": "This email is already registered",
       "invalidCredentials": "Invalid email or password",
-      "accountNotFound": "Account not found"
+      "accountNotFound": "Account not found",
+      "general": "An error occurred. Please try again."
     }
   },
   "landing": {
@@ -202,6 +206,9 @@
       "title": "My Bids",
       "noBids": "You haven't placed any bids yet"
     },
+    "day": "day",
+    "days": "days",
+    "all": "All",
     "success": "Your bid has been submitted successfully!",
     "errors": {
       "priceRequired": "Price is required",
@@ -263,7 +270,15 @@
     "pay": "Pay Now",
     "success": "Payment successful!",
     "failed": "Payment failed",
-    "uploadReceipt": "Upload Transfer Receipt"
+    "uploadReceipt": "Upload Transfer Receipt",
+    "payableInUsd": "Payable in USD",
+    "cashDescription": "Pay the craftsman in cash upon completion of the work. Both parties will confirm the transaction in the app.",
+    "bankDetailsTitle": "Bank Details:",
+    "bankName": "Bank: Commercial Bank of Syria",
+    "bankAccount": "Account: XXXX-XXXX-XXXX",
+    "bankIban": "IBAN: SY00 0000 0000 0000",
+    "syriatelTransfer": "Transfer to Syriatel Cash number:",
+    "syriatelNote": "Include the job reference in the transfer note."
   },
   "notifications": {
     "title": "Notifications",
@@ -294,6 +309,67 @@
     "Tartus": "Tartus",
     "As-Suwayda": "As-Suwayda",
     "Rural Damascus": "Rural Damascus"
+  },
+  "admin": {
+    "title": "Admin Panel",
+    "subtitle": "Manage users and jobs",
+    "totalUsers": "Total Users",
+    "totalJobs": "Total Jobs",
+    "totalBids": "Total Bids",
+    "openJobs": "Open Jobs",
+    "customers": "Customers",
+    "craftsmen": "Craftsmen",
+    "recentUsers": "Recent Users",
+    "recentJobs": "Recent Jobs",
+    "name": "Name",
+    "role": "Role",
+    "jobsBids": "Jobs/Bids",
+    "status": "Status",
+    "action": "Action",
+    "active": "Active",
+    "inactive": "Inactive",
+    "jobTitle": "Title",
+    "customer": "Customer",
+    "category": "Category",
+    "bids": "Bids"
+  },
+  "craftsmen": {
+    "title": "Find Craftsmen",
+    "count": "craftsmen",
+    "allCategories": "All Categories",
+    "highestRated": "Highest Rated",
+    "mostReviews": "Most Reviews",
+    "newest": "Newest",
+    "filter": "Filter",
+    "noCraftsmen": "No craftsmen found",
+    "available": "Available",
+    "unavailable": "Unavailable"
+  },
+  "profileEdit": {
+    "basicInfo": "Basic Information",
+    "nameEnglish": "Name (English)",
+    "nameArabic": "Name (Arabic)",
+    "phoneNumber": "Phone Number",
+    "governorate": "Governorate",
+    "selectGovernorate": "Select Governorate",
+    "profileImageUrl": "Profile Image URL",
+    "professionalProfile": "Professional Profile",
+    "businessNameEnglish": "Business Name (English)",
+    "businessNameArabic": "Business Name (Arabic)",
+    "bioEnglish": "Bio (English)",
+    "bioArabic": "Bio (Arabic)",
+    "yearsOfExperience": "Years of Experience",
+    "specializations": "Specializations",
+    "portfolio": "Portfolio",
+    "uploading": "Uploading...",
+    "addImage": "+ Add Image",
+    "imageAdded": "Image added",
+    "uploadFailed": "Upload failed",
+    "profileSaved": "Profile saved successfully"
+  },
+  "jobDetail": {
+    "notFound": "Job not found",
+    "loginToBid": "Login as a craftsman to place a bid"
   },
   "errors": {
     "404": "Page Not Found",

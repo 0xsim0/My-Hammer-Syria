@@ -5,15 +5,9 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Avatar, Button, Skeleton } from "@/components/ui";
 import { ArrowLeft, Send } from "lucide-react";
+import { useRealTimeChat } from "@/hooks/useRealTimeChat";
 
-interface Message {
-  id: string;
-  content: string;
-  senderId: string;
-  createdAt: string;
-}
-
-interface ConversationData {
+interface ConversationMeta {
   id: string;
   otherUser: {
     id: string;
@@ -21,7 +15,6 @@ interface ConversationData {
     image?: string | null;
   };
   job?: { id: string; title: string } | null;
-  messages: Message[];
 }
 
 export default function ChatPage({
@@ -31,75 +24,71 @@ export default function ChatPage({
 }) {
   const t = useTranslations("chat");
   const convId = params.conversationId;
-  const [conv, setConv] = useState<ConversationData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState("");
-  const [sending, setSending] = useState(false);
+  const [meta, setMeta] = useState<ConversationMeta | null>(null);
+  const [metaLoading, setMetaLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string>("");
+  const [message, setMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const { messages, isLoading, isSending, sendMessage } = useRealTimeChat(
+    convId,
+    currentUserId
+  );
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
+  // Load conversation meta (other user info, job) and session
   useEffect(() => {
-    fetchConversation(convId);
+    async function loadMeta() {
+      try {
+        const [convRes, sessionRes] = await Promise.all([
+          fetch(`/api/messages/${convId}`),
+          fetch("/api/auth/session"),
+        ]);
+        if (convRes.ok) {
+          const data = await convRes.json();
+          setMeta({
+            id: data.id,
+            otherUser: data.otherUser,
+            job: data.job,
+          });
+        }
+        if (sessionRes.ok) {
+          const session = await sessionRes.json();
+          setCurrentUserId(session?.user?.id || "");
+        }
+      } finally {
+        setMetaLoading(false);
+      }
+    }
+    loadMeta();
   }, [convId]);
 
   useEffect(() => {
     scrollToBottom();
-  }, [conv?.messages, scrollToBottom]);
+  }, [messages, scrollToBottom]);
 
-  async function fetchConversation(id: string) {
-    try {
-      const [convRes, sessionRes] = await Promise.all([
-        fetch(`/api/messages/${id}`),
-        fetch("/api/auth/session"),
-      ]);
-      if (convRes.ok) {
-        const data = await convRes.json();
-        setConv(data);
-      }
-      if (sessionRes.ok) {
-        const session = await sessionRes.json();
-        setCurrentUserId(session?.user?.id || "");
-      }
-    } catch {
-      // handle error
-    } finally {
-      setLoading(false);
-    }
-  }
+  // Mark messages as read when opening conversation
+  useEffect(() => {
+    if (!convId) return;
+    fetch(`/api/messages/${convId}/read`, { method: "PATCH" }).catch(() => {});
+  }, [convId]);
 
   async function handleSend(e: React.FormEvent) {
     e.preventDefault();
-    if (!message.trim() || !convId) return;
-
-    setSending(true);
+    if (!message.trim()) return;
+    const content = message;
+    setMessage("");
     try {
-      const res = await fetch(`/api/messages/${convId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: message }),
-      });
-
-      if (res.ok) {
-        const newMsg = await res.json();
-        setConv((prev) =>
-          prev
-            ? { ...prev, messages: [...prev.messages, newMsg] }
-            : prev
-        );
-        setMessage("");
-      }
+      await sendMessage(content);
     } catch {
-      // handle error
-    } finally {
-      setSending(false);
+      setMessage(content); // restore on error
     }
   }
 
-  if (loading) {
+  if (metaLoading || isLoading) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
         <Skeleton variant="text" className="mb-4 h-12 w-full" />
@@ -116,7 +105,7 @@ export default function ChatPage({
     );
   }
 
-  if (!conv) {
+  if (!meta) {
     return (
       <div className="flex flex-col items-center gap-4 py-16 text-center">
         <p className="text-gray-500">Conversation not found</p>
@@ -139,20 +128,20 @@ export default function ChatPage({
           <ArrowLeft className="h-5 w-5 rtl:rotate-180" aria-hidden="true" />
         </Link>
         <Avatar
-          name={conv.otherUser.name}
-          src={conv.otherUser.image}
+          name={meta.otherUser.name}
+          src={meta.otherUser.image}
           size="sm"
         />
         <div className="min-w-0 flex-1">
           <p className="font-medium text-gray-900 truncate">
-            {conv.otherUser.name}
+            {meta.otherUser.name}
           </p>
-          {conv.job && (
+          {meta.job && (
             <Link
-              href={`/jobs/${conv.job.id}`}
+              href={`/jobs/${meta.job.id}`}
               className="text-xs text-primary-600 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:rounded-sm"
             >
-              {conv.job.title}
+              {meta.job.title}
             </Link>
           )}
         </div>
@@ -161,7 +150,7 @@ export default function ChatPage({
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4">
         <div className="flex flex-col gap-3">
-          {conv.messages.map((msg) => {
+          {messages.map((msg) => {
             const isMe = msg.senderId === currentUserId;
             return (
               <div
@@ -209,7 +198,7 @@ export default function ChatPage({
         />
         <button
           type="submit"
-          disabled={!message.trim() || sending}
+          disabled={!message.trim() || isSending}
           className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-600 text-white transition-colors hover:bg-primary-700 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 touch-manipulation"
           aria-label={t("send")}
         >

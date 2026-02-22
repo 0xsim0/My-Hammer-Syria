@@ -107,6 +107,12 @@ model Job {
   review        Review?
   payment       Payment?
   conversation  Conversation?
+
+  @@index([customerId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([governorate])
+  @@index([createdAt])
 }
 
 model Bid {
@@ -125,6 +131,7 @@ model Bid {
   updatedAt       DateTime  @updatedAt
 
   @@unique([jobId, craftsmanId])
+  @@index([craftsmanId])
 }
 
 model Review {
@@ -141,6 +148,9 @@ model Review {
   comment           String?
   commentAr         String?
   createdAt         DateTime  @default(now())
+
+  @@index([revieweeId])
+  @@index([reviewerId])
 }
 
 model Conversation {
@@ -164,6 +174,7 @@ model ConversationParticipant {
   lastReadAt      DateTime?
 
   @@unique([conversationId, userId])
+  @@index([userId])
 }
 
 model Message {
@@ -176,6 +187,10 @@ model Message {
   imageUrl        String?
   isRead          Boolean       @default(false)
   createdAt       DateTime      @default(now())
+
+  @@index([conversationId])
+  @@index([isRead])
+  @@index([createdAt])
 }
 
 model Payment {
@@ -207,6 +222,8 @@ model Notification {
   link      String?
   isRead    Boolean   @default(false)
   createdAt DateTime  @default(now())
+
+  @@index([userId, isRead])
 }
 
 // NextAuth models
@@ -243,4 +260,14 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
 }

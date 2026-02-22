@@ -7,22 +7,32 @@ import { Spinner } from "./Spinner";
 
 const variantClasses = {
   primary:
-    "bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800",
+    "bg-primary-600 text-white shadow-sm shadow-primary-600/30 " +
+    "hover:bg-primary-500 hover:shadow-md hover:shadow-primary-500/40 hover:-translate-y-px " +
+    "active:bg-primary-700 active:translate-y-0 active:shadow-sm",
   secondary:
-    "bg-gray-100 text-gray-900 hover:bg-gray-200 active:bg-gray-300",
+    "bg-gray-100 text-gray-800 shadow-sm " +
+    "hover:bg-gray-200 hover:shadow " +
+    "active:bg-gray-300",
   ghost:
-    "bg-transparent text-gray-700 hover:bg-gray-100 active:bg-gray-200",
+    "bg-transparent text-gray-700 " +
+    "hover:bg-gray-100 hover:text-gray-900 " +
+    "active:bg-gray-200",
   destructive:
-    "bg-red-600 text-white hover:bg-red-700 active:bg-red-800",
+    "bg-red-600 text-white shadow-sm shadow-red-600/30 " +
+    "hover:bg-red-500 hover:shadow-md hover:shadow-red-500/40 hover:-translate-y-px " +
+    "active:bg-red-700 active:translate-y-0 active:shadow-sm",
   outline:
-    "border border-gray-300 bg-transparent text-gray-700 hover:bg-gray-50 active:bg-gray-100",
+    "border border-gray-300 bg-white text-gray-700 shadow-sm " +
+    "hover:border-primary-400 hover:text-primary-700 hover:bg-primary-50 hover:shadow " +
+    "active:bg-primary-100 active:border-primary-500",
 } as const;
 
 const sizeClasses = {
-  sm: "h-8 px-3 text-sm gap-1.5",
-  md: "h-10 px-4 text-sm gap-2",
-  lg: "h-12 px-6 text-base gap-2.5",
-  icon: "h-10 w-10 p-0",
+  sm: "h-8 px-3 text-sm gap-1.5 rounded-md",
+  md: "h-10 px-4 text-sm gap-2 rounded-lg",
+  lg: "h-12 px-6 text-base gap-2.5 rounded-xl",
+  icon: "h-10 w-10 p-0 rounded-lg",
 } as const;
 
 export interface ButtonProps
@@ -54,12 +64,12 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <Comp
         ref={ref}
         className={cn(
-          "inline-flex items-center justify-center rounded-lg font-medium",
-          "transition-[opacity,transform] duration-150",
+          "inline-flex items-center justify-center font-medium",
+          "transition-all duration-200 ease-out",
           "touch-manipulation select-none",
           "focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none",
-          "disabled:pointer-events-none disabled:opacity-50",
-          "motion-reduce:transition-none",
+          "disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none disabled:translate-y-0",
+          "motion-reduce:transition-none motion-reduce:hover:translate-y-0",
           variantClasses[variant],
           sizeClasses[size],
           className

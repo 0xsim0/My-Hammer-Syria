@@ -3,7 +3,8 @@ import { Link } from "@/i18n/navigation";
 import { redirect } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 import { auth } from "@/lib/auth";
-import PostJobForm from "./PostJobForm";
+import { PostJobForm } from "@/components/jobs/PostJobForm";
+import { prisma } from "@/lib/prisma";
 
 export async function generateMetadata() {
   const t = await getTranslations("jobs.post");
@@ -17,6 +18,11 @@ export default async function PostJobPage() {
 
   const t = await getTranslations("jobs.post");
   const tNav = await getTranslations("nav");
+  const categories = await prisma.category.findMany({
+    where: { isActive: true },
+    orderBy: { name: "asc" },
+    select: { id: true, name: true },
+  });
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
@@ -42,7 +48,7 @@ export default async function PostJobPage() {
 
       <h1 className="mb-8 text-2xl font-bold text-gray-900">{t("title")}</h1>
 
-      <PostJobForm />
+      <PostJobForm categories={categories} />
     </div>
   );
 }

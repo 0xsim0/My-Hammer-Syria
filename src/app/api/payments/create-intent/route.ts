@@ -7,7 +7,7 @@ import { z } from "zod";
 const createPaymentSchema = z.object({
   jobId: z.string().min(1),
   amount: z.number().positive(),
-  currency: z.enum(["usd", "syp"]),
+  currency: z.enum(["usd", "syp"]).optional().default("usd"),
 });
 
 export async function POST(request: NextRequest) {
@@ -27,7 +27,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { jobId, amount, currency } = parsed.data;
+    const { jobId, amount } = parsed.data;
+    // Stripe does not support SYP; always charge in USD
+    const currency = "usd";
 
     const paymentIntent = await createPaymentIntent(amount, currency, {
       jobId,
@@ -39,7 +41,7 @@ export async function POST(request: NextRequest) {
         jobId,
         userId: session.user.id,
         amount,
-        currency: currency === "usd" ? "USD" : "SYP",
+        currency: "USD",
         method: "STRIPE",
         status: "PENDING",
         stripePaymentId: paymentIntent.id,

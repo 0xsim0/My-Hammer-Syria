@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui";
 import { Users, Briefcase, ShieldCheck, ToggleLeft, ToggleRight } from "lucide-react";
 import AdminActions from "./AdminActions";
 
+
 export async function generateMetadata() {
   return { title: "Admin Panel" };
 }
@@ -17,6 +18,8 @@ export default async function AdminPage() {
   if (session.user.role !== "ADMIN") redirect("/");
 
   const locale = await getLocale();
+  const t = await getTranslations("admin");
+  const tJobs = await getTranslations("jobs");
 
   const [totalUsers, totalJobs, totalBids, recentUsers, recentJobs] = await Promise.all([
     prisma.user.count(),
@@ -52,19 +55,19 @@ export default async function AdminPage() {
   const openJobsCount = await prisma.job.count({ where: { status: "OPEN" } });
 
   const stats = [
-    { label: locale === "ar" ? "إجمالي المستخدمين" : "Total Users", value: totalUsers, icon: Users, color: "bg-blue-50 text-blue-700" },
-    { label: locale === "ar" ? "إجمالي الطلبات" : "Total Jobs", value: totalJobs, icon: Briefcase, color: "bg-green-50 text-green-700" },
-    { label: locale === "ar" ? "إجمالي العروض" : "Total Bids", value: totalBids, icon: ShieldCheck, color: "bg-purple-50 text-purple-700" },
-    { label: locale === "ar" ? "طلبات مفتوحة" : "Open Jobs", value: openJobsCount, icon: Briefcase, color: "bg-orange-50 text-orange-700" },
+    { label: t("totalUsers"), value: totalUsers, icon: Users, color: "bg-blue-50 text-blue-700" },
+    { label: t("totalJobs"), value: totalJobs, icon: Briefcase, color: "bg-green-50 text-green-700" },
+    { label: t("totalBids"), value: totalBids, icon: ShieldCheck, color: "bg-purple-50 text-purple-700" },
+    { label: t("openJobs"), value: openJobsCount, icon: Briefcase, color: "bg-orange-50 text-orange-700" },
   ];
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <h1 className="mb-2 text-2xl font-bold text-gray-900">
-        {locale === "ar" ? "لوحة الإدارة" : "Admin Panel"}
+        {t("title")}
       </h1>
       <p className="mb-8 text-sm text-gray-500">
-        {locale === "ar" ? "إدارة المستخدمين والطلبات" : "Manage users and jobs"}
+        {t("subtitle")}
       </p>
 
       {/* Stats */}
@@ -82,14 +85,14 @@ export default async function AdminPage() {
       </div>
 
       <div className="mb-4 flex gap-4 text-sm text-gray-600">
-        <span>{locale === "ar" ? "عملاء" : "Customers"}: <strong>{customerCount}</strong></span>
-        <span>{locale === "ar" ? "حرفيون" : "Craftsmen"}: <strong>{craftsmanCount}</strong></span>
+        <span>{t("customers")}: <strong>{customerCount}</strong></span>
+        <span>{t("craftsmen")}: <strong>{craftsmanCount}</strong></span>
       </div>
 
       {/* Users Table */}
       <section className="mb-10">
         <h2 className="mb-4 text-lg font-semibold text-gray-900">
-          {locale === "ar" ? "آخر المستخدمين" : "Recent Users"}
+          {t("recentUsers")}
         </h2>
         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
           <div className="overflow-x-auto">
@@ -97,20 +100,20 @@ export default async function AdminPage() {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-4 py-3 text-start font-medium text-gray-500">
-                    {locale === "ar" ? "الاسم" : "Name"}
+                    {t("name")}
                   </th>
                   <th className="px-4 py-3 text-start font-medium text-gray-500">Email</th>
                   <th className="px-4 py-3 text-start font-medium text-gray-500">
-                    {locale === "ar" ? "الدور" : "Role"}
+                    {t("role")}
                   </th>
                   <th className="px-4 py-3 text-start font-medium text-gray-500">
-                    {locale === "ar" ? "الطلبات/العروض" : "Jobs/Bids"}
+                    {t("jobsBids")}
                   </th>
                   <th className="px-4 py-3 text-start font-medium text-gray-500">
-                    {locale === "ar" ? "الحالة" : "Status"}
+                    {t("status")}
                   </th>
                   <th className="px-4 py-3 text-start font-medium text-gray-500">
-                    {locale === "ar" ? "إجراء" : "Action"}
+                    {t("action")}
                   </th>
                 </tr>
               </thead>
@@ -144,12 +147,12 @@ export default async function AdminPage() {
                       {user.isActive ? (
                         <span className="flex items-center gap-1 text-green-600">
                           <ToggleRight className="h-4 w-4" />
-                          {locale === "ar" ? "نشط" : "Active"}
+                          {t("active")}
                         </span>
                       ) : (
                         <span className="flex items-center gap-1 text-red-500">
                           <ToggleLeft className="h-4 w-4" />
-                          {locale === "ar" ? "موقوف" : "Inactive"}
+                          {t("inactive")}
                         </span>
                       )}
                     </td>
@@ -172,7 +175,7 @@ export default async function AdminPage() {
       {/* Jobs Table */}
       <section>
         <h2 className="mb-4 text-lg font-semibold text-gray-900">
-          {locale === "ar" ? "آخر الطلبات" : "Recent Jobs"}
+          {t("recentJobs")}
         </h2>
         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
           <div className="overflow-x-auto">
@@ -180,19 +183,19 @@ export default async function AdminPage() {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-4 py-3 text-start font-medium text-gray-500">
-                    {locale === "ar" ? "العنوان" : "Title"}
+                    {t("jobTitle")}
                   </th>
                   <th className="px-4 py-3 text-start font-medium text-gray-500">
-                    {locale === "ar" ? "العميل" : "Customer"}
+                    {t("customer")}
                   </th>
                   <th className="px-4 py-3 text-start font-medium text-gray-500">
-                    {locale === "ar" ? "الفئة" : "Category"}
+                    {t("category")}
                   </th>
                   <th className="px-4 py-3 text-start font-medium text-gray-500">
-                    {locale === "ar" ? "العروض" : "Bids"}
+                    {t("bids")}
                   </th>
                   <th className="px-4 py-3 text-start font-medium text-gray-500">
-                    {locale === "ar" ? "الحالة" : "Status"}
+                    {t("status")}
                   </th>
                 </tr>
               </thead>
@@ -220,7 +223,7 @@ export default async function AdminPage() {
                     <td className="px-4 py-3 text-gray-500">{job._count.bids}</td>
                     <td className="px-4 py-3">
                       <Badge variant={job.status as "OPEN"}>
-                        {job.status}
+                        {tJobs(`status.${job.status}`)}
                       </Badge>
                     </td>
                   </tr>

@@ -5,7 +5,7 @@
 @layer base {
   :root {
     --font-inter: "Inter", system-ui, sans-serif;
-    --font-cairo: "Cairo", system-ui, sans-serif;
+    --font-lalezar: "Lalezar", system-ui, sans-serif;
   }
 
   * {
@@ -34,7 +34,7 @@
   }
 
   [dir="rtl"] body {
-    font-family: var(--font-cairo);
+    font-family: var(--font-lalezar);
   }
 
   /* Safe area support for mobile */

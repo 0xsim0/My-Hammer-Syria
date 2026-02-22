@@ -31,6 +31,7 @@
   "nav": {
     "home": "الرئيسية",
     "findJobs": "ابحث عن عمل",
+    "findCraftsmen": "ابحث عن حرفيين",
     "postJob": "انشر طلباً",
     "myJobs": "طلباتي",
     "myBids": "عروضي",
@@ -42,7 +43,8 @@
     "logout": "تسجيل الخروج",
     "admin": "لوحة الإدارة",
     "switchToCustomer": "التبديل إلى عميل",
-    "switchToCraftsman": "التبديل إلى حرفي"
+    "switchToCraftsman": "التبديل إلى حرفي",
+    "settings": "الإعدادات"
   },
   "auth": {
     "login": "تسجيل الدخول",
@@ -58,6 +60,7 @@
     "craftsman": "حرفي (أقدم خدمات)",
     "governorate": "المحافظة",
     "forgotPassword": "نسيت كلمة المرور؟",
+    "backToLogin": "العودة لتسجيل الدخول",
     "alreadyHaveAccount": "لديك حساب؟",
     "dontHaveAccount": "ليس لديك حساب؟",
     "loginHere": "سجل الدخول هنا",
@@ -68,7 +71,8 @@
       "passwordsDoNotMatch": "كلمتا المرور غير متطابقتين",
       "emailAlreadyExists": "هذا البريد الإلكتروني مسجل مسبقاً",
       "invalidCredentials": "بريد إلكتروني أو كلمة مرور غير صحيحة",
-      "accountNotFound": "الحساب غير موجود"
+      "accountNotFound": "الحساب غير موجود",
+      "general": "حدث خطأ. يرجى المحاولة مرة أخرى."
     }
   },
   "landing": {
@@ -202,6 +206,9 @@
       "title": "عروضي",
       "noBids": "لم تقدم أي عروض بعد"
     },
+    "day": "يوم",
+    "days": "أيام",
+    "all": "الكل",
     "success": "تم إرسال عرضك بنجاح!",
     "errors": {
       "priceRequired": "السعر مطلوب",
@@ -263,7 +270,15 @@
     "pay": "ادفع الآن",
     "success": "تم الدفع بنجاح!",
     "failed": "فشلت عملية الدفع",
-    "uploadReceipt": "رفع إيصال التحويل"
+    "uploadReceipt": "رفع إيصال التحويل",
+    "payableInUsd": "الدفع بالدولار الأمريكي",
+    "cashDescription": "ادفع للحرفي نقداً عند اكتمال العمل. سيقوم الطرفان بتأكيد المعاملة في التطبيق.",
+    "bankDetailsTitle": "تفاصيل الحساب البنكي:",
+    "bankName": "البنك: المصرف التجاري السوري",
+    "bankAccount": "الحساب: XXXX-XXXX-XXXX",
+    "bankIban": "IBAN: SY00 0000 0000 0000",
+    "syriatelTransfer": "حول إلى رقم سيريتل كاش:",
+    "syriatelNote": "ضع رقم مرجع الطلب في ملاحظة التحويل."
   },
   "notifications": {
     "title": "الإشعارات",
@@ -294,6 +309,67 @@
     "Tartus": "طرطوس",
     "As-Suwayda": "السويداء",
     "Rural Damascus": "ريف دمشق"
+  },
+  "admin": {
+    "title": "لوحة الإدارة",
+    "subtitle": "إدارة المستخدمين والطلبات",
+    "totalUsers": "إجمالي المستخدمين",
+    "totalJobs": "إجمالي الطلبات",
+    "totalBids": "إجمالي العروض",
+    "openJobs": "طلبات مفتوحة",
+    "customers": "عملاء",
+    "craftsmen": "حرفيون",
+    "recentUsers": "آخر المستخدمين",
+    "recentJobs": "آخر الطلبات",
+    "name": "الاسم",
+    "role": "الدور",
+    "jobsBids": "الطلبات/العروض",
+    "status": "الحالة",
+    "action": "إجراء",
+    "active": "نشط",
+    "inactive": "موقوف",
+    "jobTitle": "العنوان",
+    "customer": "العميل",
+    "category": "الفئة",
+    "bids": "العروض"
+  },
+  "craftsmen": {
+    "title": "ابحث عن حرفيين",
+    "count": "حرفي",
+    "allCategories": "جميع التخصصات",
+    "highestRated": "الأعلى تقييماً",
+    "mostReviews": "الأكثر تقييمات",
+    "newest": "الأحدث",
+    "filter": "تصفية",
+    "noCraftsmen": "لا يوجد حرفيون",
+    "available": "متاح الآن",
+    "unavailable": "غير متاح"
+  },
+  "profileEdit": {
+    "basicInfo": "المعلومات الأساسية",
+    "nameEnglish": "الاسم (بالإنجليزية)",
+    "nameArabic": "الاسم (بالعربية)",
+    "phoneNumber": "رقم الهاتف",
+    "governorate": "المحافظة",
+    "selectGovernorate": "اختر المحافظة",
+    "profileImageUrl": "رابط الصورة الشخصية",
+    "professionalProfile": "الملف المهني",
+    "businessNameEnglish": "اسم النشاط التجاري (إنجليزي)",
+    "businessNameArabic": "اسم النشاط التجاري (عربي)",
+    "bioEnglish": "نبذة عنك (إنجليزي)",
+    "bioArabic": "نبذة عنك (عربي)",
+    "yearsOfExperience": "سنوات الخبرة",
+    "specializations": "التخصصات",
+    "portfolio": "معرض الأعمال",
+    "uploading": "جاري الرفع...",
+    "addImage": "+ إضافة صورة",
+    "imageAdded": "تمت إضافة الصورة",
+    "uploadFailed": "حدث خطأ",
+    "profileSaved": "تم حفظ الملف الشخصي بنجاح"
+  },
+  "jobDetail": {
+    "notFound": "الطلب غير موجود",
+    "loginToBid": "سجل الدخول كحرفي لتقديم عرض"
   },
   "errors": {
     "404": "الصفحة غير موجودة",

@@ -1,6 +1,7 @@
-import { Cairo, Inter } from "next/font/google";
+import { Inter, Lalezar } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
+import type { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -8,11 +9,39 @@ import MobileNav from "@/components/layout/MobileNav";
 import { Toaster } from "react-hot-toast";
 import "../globals.css";
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://myhammersyria.com";
+  return {
+    title: {
+      default: "My Hammer Syria | مطرقتي سوريا",
+      template: "%s | My Hammer Syria",
+    },
+    description:
+      locale === "ar"
+        ? "منصة الحرفيين في سوريا — ابحث عن حرفيين موثوقين أو انشر وظيفتك اليوم"
+        : "Find skilled craftsmen in Syria or post a job — My Hammer Syria connects customers with trusted professionals.",
+    metadataBase: new URL(baseUrl),
+    openGraph: {
+      type: "website",
+      locale: locale === "ar" ? "ar_SY" : "en_US",
+      url: baseUrl,
+      siteName: "My Hammer Syria",
+      images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "My Hammer Syria" }],
+    },
+    twitter: { card: "summary_large_image" },
+    alternates: {
+      languages: { ar: `${baseUrl}/ar`, en: `${baseUrl}/en` },
+    },
+  };
+}
+
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const cairo = Cairo({
-  subsets: ["arabic", "latin"],
-  variable: "--font-cairo",
-});
+const lalezar = Lalezar({ subsets: ["arabic", "latin"], weight: "400", variable: "--font-lalezar" });
 
 export default async function LocaleLayout({
   children,
@@ -29,7 +58,7 @@ export default async function LocaleLayout({
     <html
       lang={locale}
       dir={isRTL ? "rtl" : "ltr"}
-      className={`${inter.variable} ${cairo.variable}`}
+      className={`${inter.variable} ${lalezar.variable}`}
     >
       <body className={isRTL ? "font-arabic" : "font-sans"}>
         <SessionProvider>

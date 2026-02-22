@@ -14,7 +14,7 @@ async function JobResults({
   searchParams,
 }: {
   searchParams: {
-    category?: string;
+    categoryId?: string;
     governorate?: string;
     search?: string;
     page?: string;
@@ -42,7 +42,7 @@ async function JobResults({
   try {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const params = new URLSearchParams({ status: "OPEN" });
-    if (searchParams.category) params.set("category", searchParams.category);
+    if (searchParams.categoryId) params.set("categoryId", searchParams.categoryId);
     if (searchParams.governorate) params.set("governorate", searchParams.governorate);
     if (searchParams.search) params.set("search", searchParams.search);
     if (searchParams.page) params.set("page", searchParams.page);
@@ -152,7 +152,7 @@ export default async function FindJobsPage({
   searchParams,
 }: {
   searchParams: Promise<{
-    category?: string;
+    categoryId?: string;
     governorate?: string;
     search?: string;
     page?: string;
@@ -169,7 +169,7 @@ export default async function FindJobsPage({
         {/* Sidebar filters */}
         <aside className="w-full shrink-0 lg:w-64">
           <FindJobsSearch
-            currentCategory={params.category}
+            currentCategory={params.categoryId}
             currentGovernorate={params.governorate}
             currentSearch={params.search}
           />

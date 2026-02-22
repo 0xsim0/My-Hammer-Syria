@@ -1,34 +1,45 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Button, Card, CardContent, Input } from "@/components/ui";
 import { Mail, Phone, MapPin } from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function ContactPage() {
   const tCommon = useTranslations("common");
+  const locale = useLocale();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
 
-  const isRTL =
-    typeof document !== "undefined"
-      ? document.documentElement.dir === "rtl"
-      : true;
+  const isRTL = locale === "ar";
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSending(true);
-    // Simulate sending (no backend endpoint for contact form yet)
-    await new Promise((r) => setTimeout(r, 1000));
-    setSending(false);
-    setSent(true);
-    toast.success(
-      isRTL ? "تم إرسال رسالتك بنجاح!" : "Your message has been sent!"
-    );
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, message }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        toast.error(data.error || (isRTL ? "حدث خطأ" : "An error occurred"));
+        return;
+      }
+      setSent(true);
+      toast.success(
+        isRTL ? "تم إرسال رسالتك بنجاح!" : "Your message has been sent!"
+      );
+    } catch {
+      toast.error(isRTL ? "حدث خطأ" : "An error occurred");
+    } finally {
+      setSending(false);
+    }
   }
 
   return (

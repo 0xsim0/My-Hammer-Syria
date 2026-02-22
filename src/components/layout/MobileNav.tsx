@@ -38,8 +38,11 @@ export default function MobileNav() {
   }
 
   return (
-    <div className="fixed bottom-0 start-0 end-0 z-40 border-t border-gray-200 bg-white pb-safe md:hidden">
-      <nav aria-label="Mobile navigation" className="flex items-center justify-around px-2 py-1">
+    <div className="fixed bottom-0 start-0 end-0 z-40 border-t border-gray-100 bg-white/98 pb-safe shadow-[0_-1px_12px_rgba(0,0,0,0.08)] backdrop-blur-md md:hidden">
+      <nav
+        aria-label="Mobile navigation"
+        className="flex items-end justify-around px-2 py-1.5"
+      >
         {items.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.href);
@@ -49,12 +52,13 @@ export default function MobileNav() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex -mt-4 flex-col items-center"
+                className="flex -mt-5 flex-col items-center gap-1"
+                aria-label={item.label}
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-600 text-white shadow-lg transition-transform hover:scale-105">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 text-white shadow-lg shadow-primary-500/30 transition-all duration-200 hover:scale-105 hover:shadow-xl hover:shadow-primary-500/40 active:scale-95">
                   <Icon className="h-6 w-6" aria-hidden="true" />
                 </div>
-                <span className="mt-0.5 text-[10px] font-medium text-primary-600">
+                <span className="text-[10px] font-semibold text-primary-600">
                   {item.label}
                 </span>
               </Link>
@@ -65,12 +69,29 @@ export default function MobileNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center gap-0.5 px-2 py-1.5 ${
-                active ? "text-primary-600" : "text-gray-500"
+              className={`relative flex flex-col items-center gap-1 px-3 py-1.5 transition-colors duration-150 ${
+                active ? "text-primary-600" : "text-gray-400 hover:text-gray-600"
               }`}
             >
-              <Icon className="h-5 w-5" aria-hidden="true" />
-              <span className="text-[10px] font-medium">{item.label}</span>
+              <div
+                className={`flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-150 ${
+                  active
+                    ? "bg-primary-50 text-primary-600"
+                    : "text-gray-400 hover:bg-gray-50"
+                }`}
+              >
+                <Icon className="h-5 w-5" aria-hidden="true" />
+              </div>
+              <span
+                className={`text-[10px] font-medium ${
+                  active ? "text-primary-600" : "text-gray-400"
+                }`}
+              >
+                {item.label}
+              </span>
+              {active && (
+                <span className="absolute top-0 left-1/2 h-0.5 w-5 -translate-x-1/2 rounded-full bg-primary-500" />
+              )}
             </Link>
           );
         })}

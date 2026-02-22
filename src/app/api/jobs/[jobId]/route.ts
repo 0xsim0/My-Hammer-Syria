@@ -38,6 +38,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             },
           },
         },
+        conversation: { select: { id: true } },
+        review: { select: { id: true } },
       },
     });
 

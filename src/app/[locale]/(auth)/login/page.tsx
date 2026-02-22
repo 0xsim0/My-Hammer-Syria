@@ -86,14 +86,12 @@ export default function LoginPage() {
             />
 
             <div className="flex justify-end">
-              <button
-                type="button"
-                disabled
-                className="text-sm text-gray-400 cursor-not-allowed"
-                aria-disabled="true"
+              <Link
+                href="/forgot-password"
+                className="text-sm text-primary-600 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:rounded-sm"
               >
                 {t("forgotPassword")}
-              </button>
+              </Link>
             </div>
 
             <Button type="submit" isLoading={loading} className="w-full">

@@ -28,7 +28,9 @@ export async function GET() {
         totalReviews: true,
         isVerified: true,
         createdAt: true,
-        craftsmanProfile: true,
+        craftsmanProfile: {
+          include: { categories: { select: { id: true } } },
+        },
       },
     });
 
