@@ -41,8 +41,8 @@ export async function generateMetadata({
   };
 }
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const lalezar = Lalezar({ subsets: ["arabic", "latin"], weight: "400", variable: "--font-lalezar" });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+const lalezar = Lalezar({ subsets: ["arabic", "latin"], weight: "400", variable: "--font-lalezar", display: "swap" });
 
 export default async function LocaleLayout({
   children,
