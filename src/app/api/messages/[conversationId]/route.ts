@@ -38,8 +38,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
               select: { id: true, name: true, image: true },
             },
           },
-          orderBy: { createdAt: "asc" },
-          take: 100,
+          orderBy: { createdAt: "desc" },
+          take: 50,
         },
       },
     });
@@ -73,7 +73,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       job: conversation.job
         ? { id: conversation.job.id, title: conversation.job.title }
         : null,
-      messages: conversation.messages.map((msg) => ({
+      messages: [...conversation.messages].reverse().map((msg) => ({
         id: msg.id,
         content: msg.content,
         senderId: msg.senderId,
@@ -159,21 +159,25 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    for (const p of otherParticipants) {
-      await prisma.notification.create({
-        data: {
+    if (otherParticipants.length > 0) {
+      await prisma.notification.createMany({
+        data: otherParticipants.map((p) => ({
           userId: p.userId,
           type: "NEW_MESSAGE",
           titleEn: "New message",
           titleAr: "رسالة جديدة",
           link: `/messages/${conversationId}`,
-        },
+        })),
       });
 
-      await safeTrigger(
-        getUserChannel(p.userId),
-        PUSHER_EVENTS.NEW_NOTIFICATION,
-        { type: "NEW_MESSAGE", conversationId }
+      await Promise.all(
+        otherParticipants.map((p) =>
+          safeTrigger(
+            getUserChannel(p.userId),
+            PUSHER_EVENTS.NEW_NOTIFICATION,
+            { type: "NEW_MESSAGE", conversationId }
+          )
+        )
       );
     }
 

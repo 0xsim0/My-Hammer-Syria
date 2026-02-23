@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Avatar, Card, CardContent, Skeleton } from "@/components/ui";
@@ -24,25 +24,17 @@ interface Conversation {
 
 export default function MessagesPage() {
   const t = useTranslations("chat");
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchConversations() {
-      try {
-        const res = await fetch("/api/conversations");
-        if (res.ok) {
-          const data = await res.json();
-          setConversations(data.conversations || []);
-        }
-      } catch {
-        // handle error
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchConversations();
-  }, []);
+  const { data, isLoading: loading } = useQuery({
+    queryKey: ["conversations"],
+    queryFn: async () => {
+      const res = await fetch("/api/conversations");
+      if (!res.ok) throw new Error("Failed to fetch conversations");
+      return res.json();
+    },
+  });
+
+  const conversations: Conversation[] = data?.conversations ?? [];
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">

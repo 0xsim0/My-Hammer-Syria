@@ -7,6 +7,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import MobileNav from "@/components/layout/MobileNav";
 import { Toaster } from "react-hot-toast";
+import QueryProvider from "@/components/providers/QueryProvider";
 import "../globals.css";
 
 export async function generateMetadata({
@@ -62,6 +63,7 @@ export default async function LocaleLayout({
     >
       <body className={isRTL ? "font-arabic" : "font-sans"}>
         <SessionProvider>
+          <QueryProvider>
           <NextIntlClientProvider messages={messages}>
             <a
               href="#main-content"
@@ -77,6 +79,7 @@ export default async function LocaleLayout({
             <MobileNav />
             <Toaster position={isRTL ? "bottom-left" : "bottom-right"} />
           </NextIntlClientProvider>
+          </QueryProvider>
         </SessionProvider>
       </body>
     </html>
