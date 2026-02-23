@@ -37,6 +37,9 @@ model User {
   payments          Payment[]
   accounts          Account[]
   sessions          Session[]
+
+  @@index([role])
+  @@index([isActive])
 }
 
 model CraftsmanProfile {
@@ -113,6 +116,8 @@ model Job {
   @@index([status])
   @@index([governorate])
   @@index([createdAt])
+  @@index([deadline])
+  @@index([currency])
 }
 
 model Bid {
@@ -133,6 +138,8 @@ model Bid {
   @@unique([jobId, craftsmanId])
   @@index([craftsmanId])
   @@index([jobId, status])
+  @@index([status])
+  @@index([craftsmanId, status])
 }
 
 model Review {
@@ -163,6 +170,8 @@ model Conversation {
 
   participants ConversationParticipant[]
   messages     Message[]
+
+  @@index([updatedAt])
 }
 
 model ConversationParticipant {
@@ -194,6 +203,7 @@ model Message {
   @@index([createdAt])
   @@index([conversationId, isRead])
   @@index([conversationId, createdAt])
+  @@index([senderId])
 }
 
 model Payment {
@@ -211,6 +221,9 @@ model Payment {
   notes           String?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([status])
 }
 
 model Notification {
@@ -248,6 +261,7 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
 }
 
 model Session {
@@ -256,6 +270,8 @@ model Session {
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model VerificationToken {
