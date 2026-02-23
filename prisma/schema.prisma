@@ -132,6 +132,7 @@ model Bid {
 
   @@unique([jobId, craftsmanId])
   @@index([craftsmanId])
+  @@index([jobId, status])
 }
 
 model Review {
@@ -191,6 +192,8 @@ model Message {
   @@index([conversationId])
   @@index([isRead])
   @@index([createdAt])
+  @@index([conversationId, isRead])
+  @@index([conversationId, createdAt])
 }
 
 model Payment {
@@ -224,6 +227,7 @@ model Notification {
   createdAt DateTime  @default(now())
 
   @@index([userId, isRead])
+  @@index([userId, createdAt])
 }
 
 // NextAuth models

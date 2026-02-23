@@ -33,7 +33,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
               avgRating: true,
               totalReviews: true,
               governorate: true,
-              craftsmanProfile: true,
+              craftsmanProfile: {
+                select: {
+                  businessName: true,
+                  businessNameAr: true,
+                  yearsExperience: true,
+                  isAvailable: true,
+                },
+              },
             },
           },
         },

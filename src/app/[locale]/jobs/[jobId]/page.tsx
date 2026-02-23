@@ -261,7 +261,7 @@ export async function generateMetadata({
   try {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const res = await fetch(`${baseUrl}/api/jobs/${jobId}`, {
-      next: { revalidate: 60 },
+      next: { revalidate: 30 },
     });
     if (res.ok) {
       const job = await res.json();

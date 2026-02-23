@@ -27,6 +27,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           },
         },
         reviewsReceived: {
+          take: 20,
           include: {
             reviewer: {
               select: {
