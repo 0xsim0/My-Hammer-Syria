@@ -53,12 +53,10 @@ export async function GET(request: NextRequest) {
       prisma.craftsmanProfile.count({ where }),
     ]);
 
-    return NextResponse.json({
-      craftsmen,
-      total,
-      pages: Math.ceil(total / limit),
-      page,
-    });
+    return NextResponse.json(
+      { craftsmen, total, pages: Math.ceil(total / limit), page },
+      { headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600" } }
+    );
   } catch (error) {
     if (process.env.NODE_ENV === "development") console.error(error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

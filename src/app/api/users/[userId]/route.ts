@@ -27,7 +27,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           },
         },
         reviewsReceived: {
-          take: 20,
+          take: 5,
           include: {
             reviewer: {
               select: {
@@ -54,7 +54,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    return NextResponse.json(user);
+    return NextResponse.json(user, {
+      headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=900" },
+    });
   } catch (error) {
     if (process.env.NODE_ENV === "development") console.error(error);
     return NextResponse.json(

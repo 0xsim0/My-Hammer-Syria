@@ -33,6 +33,9 @@ export async function GET(request: NextRequest) {
       ];
     }
 
+    // Cap search results to prevent full table scans on large datasets
+    const effectiveLimit = search ? Math.min(limit, 20) : limit;
+
     // Filter by authenticated customer when customerId=me is passed
     const customerId = searchParams.get("customerId");
     if (customerId === "me") {
@@ -60,8 +63,8 @@ export async function GET(request: NextRequest) {
           },
         },
         orderBy: { createdAt: "desc" },
-        skip: (page - 1) * limit,
-        take: limit,
+        skip: (page - 1) * effectiveLimit,
+        take: effectiveLimit,
       }),
       prisma.job.count({ where }),
     ]);
@@ -72,12 +75,16 @@ export async function GET(request: NextRequest) {
       images: JSON.parse((job.images as string) || "[]"),
     }));
 
-    return NextResponse.json({
-      jobs: parsedJobs,
-      total,
-      page,
-      totalPages: Math.ceil(total / limit),
-    });
+    // Only cache public, non-personalised, non-search listings
+    const isPublicListing = !customerId && !search;
+    const cacheHeaders = isPublicListing
+      ? { "Cache-Control": "public, s-maxage=120, stale-while-revalidate=300" }
+      : { "Cache-Control": "private, no-store" };
+
+    return NextResponse.json(
+      { jobs: parsedJobs, total, page, totalPages: Math.ceil(total / limit) },
+      { headers: cacheHeaders }
+    );
   } catch (error) {
     if (process.env.NODE_ENV === "development") console.error(error);
     return NextResponse.json(

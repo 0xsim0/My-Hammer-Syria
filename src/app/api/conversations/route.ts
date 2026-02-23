@@ -59,6 +59,7 @@ export async function GET() {
         },
       },
       orderBy: { updatedAt: "desc" },
+      take: 50,
     });
 
     const result = conversations.map((conv) => ({
