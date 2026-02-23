@@ -20,7 +20,7 @@ async function JobsList({
 }) {
   const t = await getTranslations("jobs");
   const session = await auth();
-  if (!session) redirect("/login");
+  if (!session?.user?.id) redirect("/login");
 
   const whereClause: {
     customerId: string;
