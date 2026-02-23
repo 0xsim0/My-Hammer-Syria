@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import NextImage from "next/image";
 import { cn } from "./cn";
 
 const sizeClasses = {
@@ -66,10 +67,11 @@ export function Avatar({ src, name, size = "md", className, ...props }: AvatarPr
           {getInitials(name)}
         </span>
       ) : (
-        <img
+        <NextImage
           src={src!}
           alt={name}
-          className="h-full w-full object-cover"
+          fill
+          className="object-cover"
           onError={() => setImgError(true)}
         />
       )}

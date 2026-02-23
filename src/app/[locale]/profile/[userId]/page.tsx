@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Image from "next/image";
 import { getTranslations, getLocale } from "next-intl/server";
 import {
   Avatar,
@@ -162,12 +163,11 @@ async function ProfileContent({ userId }: { userId: string }) {
                 key={item.id}
                 className="relative aspect-square overflow-hidden rounded-lg bg-gray-100"
               >
-                <img
+                <Image
                   src={item.imageUrl}
                   alt={`${displayName} - ${t("portfolio")} ${i + 1}`}
-                  className="h-full w-full object-cover"
-                  width={300}
-                  height={300}
+                  fill
+                  className="object-cover"
                   loading="lazy"
                 />
               </div>

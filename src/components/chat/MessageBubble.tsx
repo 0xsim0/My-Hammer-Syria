@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import NextImage from "next/image";
 import { useLocale } from "next-intl";
 import { CheckCheck } from "lucide-react";
 import { cn } from "@/components/ui/cn";
@@ -46,11 +47,14 @@ export function MessageBubble({
         )}
       >
         {imageUrl && (
-          <img
-            src={imageUrl}
-            alt=""
-            className="mb-2 max-h-48 rounded-lg object-cover"
-          />
+          <div className="relative mb-2 h-48 w-full overflow-hidden rounded-lg">
+            <NextImage
+              src={imageUrl}
+              alt=""
+              fill
+              className="object-cover"
+            />
+          </div>
         )}
 
         {content && (

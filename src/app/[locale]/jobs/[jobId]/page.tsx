@@ -1,7 +1,9 @@
 import { Suspense } from "react";
-import { getTranslations, getLocale } from "next-intl/server";
+import Image from "next/image";
+import { getTranslations, getLocale, unstable_setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import {
   Badge,
   Card,
@@ -31,28 +33,73 @@ interface Job {
   createdAt: string;
   customer: {
     id: string;
-    name: string;
+    name: string | null;
     image?: string | null;
     createdAt: string;
   };
 }
 
-async function JobDetail({ jobId }: { jobId: string }) {
+async function JobDetail({ jobId, locale }: { jobId: string; locale: string }) {
   const t = await getTranslations("jobs");
   const tBids = await getTranslations("bids");
   const tAuth = await getTranslations("auth");
   const tDetail = await getTranslations("jobDetail");
-  const locale = await getLocale();
   const session = await auth();
 
   let job: Job | null = null;
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const res = await fetch(`${baseUrl}/api/jobs/${jobId}`, {
-      next: { revalidate: 30 },
+    // Direct Prisma query - much faster than fetch to API
+    const dbJob = await prisma.job.findUnique({
+      where: { id: jobId },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        status: true,
+        governorate: true,
+        address: true,
+        budgetMin: true,
+        budgetMax: true,
+        currency: true,
+        deadline: true,
+        images: true,
+        createdAt: true,
+        category: { select: { name: true } },
+        _count: { select: { bids: true } },
+        customer: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+            createdAt: true,
+          },
+        },
+      },
     });
-    if (res.ok) {
-      job = await res.json();
+
+    if (dbJob) {
+      job = {
+        id: dbJob.id,
+        title: dbJob.title,
+        description: dbJob.description,
+        status: dbJob.status,
+        governorate: dbJob.governorate,
+        address: dbJob.address,
+        budgetMin: dbJob.budgetMin,
+        budgetMax: dbJob.budgetMax,
+        currency: dbJob.currency,
+        deadline: dbJob.deadline?.toISOString() || null,
+        images: dbJob.images,
+        category: dbJob.category,
+        _count: dbJob._count,
+        createdAt: dbJob.createdAt.toISOString(),
+        customer: {
+          id: dbJob.customer.id,
+          name: dbJob.customer.name,
+          image: dbJob.customer.image,
+          createdAt: dbJob.customer.createdAt.toISOString(),
+        },
+      };
     }
   } catch {
     // Not found
@@ -111,12 +158,11 @@ async function JobDetail({ jobId }: { jobId: string }) {
                         key={i}
                         className="relative aspect-square overflow-hidden rounded-lg bg-gray-100"
                       >
-                        <img
+                        <Image
                           src={img}
                           alt={`${job.title} - ${i + 1}`}
-                          className="h-full w-full object-cover"
-                          width={300}
-                          height={300}
+                          fill
+                          className="object-cover"
                           loading="lazy"
                         />
                       </div>
@@ -213,13 +259,13 @@ async function JobDetail({ jobId }: { jobId: string }) {
                   className="flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:rounded-sm"
                 >
                   <Avatar
-                    name={job.customer.name}
+                    name={job.customer.name || ""}
                     src={job.customer.image}
                     size="lg"
                   />
                   <div>
                     <p className="font-medium text-gray-900">
-                      {job.customer.name}
+                      {job.customer.name || "Unknown"}
                     </p>
                     <p className="text-xs text-gray-500">
                       {formatDate(job.customer.createdAt, locale)}
@@ -255,16 +301,17 @@ function JobDetailSkeleton() {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ jobId: string }>;
+  params: Promise<{ jobId: string; locale: string }>;
 }) {
-  const { jobId } = await params;
+  const { jobId, locale } = await params;
+  unstable_setRequestLocale(locale);
+  
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const res = await fetch(`${baseUrl}/api/jobs/${jobId}`, {
-      next: { revalidate: 30 },
+    const job = await prisma.job.findUnique({
+      where: { id: jobId },
+      select: { title: true },
     });
-    if (res.ok) {
-      const job = await res.json();
+    if (job) {
       return { title: job.title };
     }
   } catch {
@@ -276,13 +323,14 @@ export async function generateMetadata({
 export default async function PublicJobPage({
   params,
 }: {
-  params: Promise<{ jobId: string }>;
+  params: Promise<{ jobId: string; locale: string }>;
 }) {
-  const { jobId } = await params;
+  const { jobId, locale } = await params;
+  unstable_setRequestLocale(locale);
 
   return (
     <Suspense fallback={<JobDetailSkeleton />}>
-      <JobDetail jobId={jobId} />
+      <JobDetail jobId={jobId} locale={locale} />
     </Suspense>
   );
 }

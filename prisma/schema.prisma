@@ -40,6 +40,9 @@ model User {
 
   @@index([role])
   @@index([isActive])
+  @@index([role, isActive])
+  @@index([avgRating])
+  @@index([totalReviews])
 }
 
 model CraftsmanProfile {
@@ -118,6 +121,11 @@ model Job {
   @@index([createdAt])
   @@index([deadline])
   @@index([currency])
+  // Composite indexes for common query patterns
+  @@index([status, createdAt])
+  @@index([categoryId, status])
+  @@index([governorate, status])
+  @@index([status, createdAt, categoryId])
 }
 
 model Bid {

@@ -1,9 +1,12 @@
 import { Suspense } from "react";
-import { getTranslations, getLocale } from "next-intl/server";
+import { getTranslations, getLocale, unstable_setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Badge, Card, CardContent, Skeleton } from "@/components/ui";
+import { prisma } from "@/lib/prisma";
 import { formatCurrency, formatRelativeDate } from "@/lib/utils";
 import FindJobsSearch from "./FindJobsSearch";
+
+const JOBS_PER_PAGE = 12;
 
 export async function generateMetadata() {
   const t = await getTranslations("jobs.list");
@@ -12,6 +15,7 @@ export async function generateMetadata() {
 
 async function JobResults({
   searchParams,
+  locale,
 }: {
   searchParams: {
     categoryId?: string;
@@ -19,9 +23,12 @@ async function JobResults({
     search?: string;
     page?: string;
   };
+  locale: string;
 }) {
   const t = await getTranslations("jobs");
-  const locale = await getLocale();
+
+  const page = Math.max(1, Number(searchParams.page) || 1);
+  const skip = (page - 1) * JOBS_PER_PAGE;
 
   let jobs: Array<{
     id: string;
@@ -33,33 +40,57 @@ async function JobResults({
     currency: string;
     status: string;
     _count?: { bids: number };
-    createdAt: string;
+    createdAt: Date;
     category?: { name: string } | null;
   }> = [];
 
   let totalPages = 1;
 
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const params = new URLSearchParams({ status: "OPEN" });
-    if (searchParams.categoryId) params.set("categoryId", searchParams.categoryId);
-    if (searchParams.governorate) params.set("governorate", searchParams.governorate);
-    if (searchParams.search) params.set("search", searchParams.search);
-    if (searchParams.page) params.set("page", searchParams.page);
-
-    const res = await fetch(`${baseUrl}/api/jobs?${params}`, {
-      next: { revalidate: 30 },
-    });
-    if (res.ok) {
-      const data = await res.json();
-      jobs = data.jobs || [];
-      totalPages = data.totalPages || 1;
+    // Build where clause
+    const where: Record<string, unknown> = { status: "OPEN" };
+    if (searchParams.categoryId) {
+      where.categoryId = searchParams.categoryId;
     }
+    if (searchParams.governorate) {
+      where.governorate = searchParams.governorate;
+    }
+    if (searchParams.search) {
+      where.OR = [
+        { title: { contains: searchParams.search, mode: "insensitive" } },
+        { description: { contains: searchParams.search, mode: "insensitive" } },
+      ];
+    }
+
+    // Direct Prisma query - much faster than fetch to API
+    const [dbJobs, total] = await Promise.all([
+      prisma.job.findMany({
+        where,
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          governorate: true,
+          budgetMin: true,
+          budgetMax: true,
+          currency: true,
+          status: true,
+          createdAt: true,
+          category: { select: { name: true } },
+          _count: { select: { bids: true } },
+        },
+        orderBy: { createdAt: "desc" },
+        skip,
+        take: JOBS_PER_PAGE,
+      }),
+      prisma.job.count({ where }),
+    ]);
+
+    jobs = dbJobs;
+    totalPages = Math.ceil(total / JOBS_PER_PAGE);
   } catch {
     // Show empty state
   }
-
-  const currentPage = Number(searchParams.page) || 1;
 
   if (jobs.length === 0) {
     return (
@@ -104,7 +135,7 @@ async function JobResults({
                       {job._count.bids} {t("detail.bids")}
                     </span>
                   )}
-                  <span>{formatRelativeDate(job.createdAt, locale)}</span>
+                  <span>{formatRelativeDate(job.createdAt.toISOString(), locale)}</span>
                 </div>
               </CardContent>
             </Card>
@@ -115,21 +146,21 @@ async function JobResults({
       {/* Pagination */}
       {totalPages > 1 && (
         <nav aria-label="Pagination" className="mt-8 flex items-center justify-center gap-2">
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
             <Link
-              key={page}
+              key={pageNum}
               href={`/find-jobs?${new URLSearchParams({
                 ...searchParams,
-                page: String(page),
+                page: String(pageNum),
               })}`}
               className={`inline-flex h-10 w-10 items-center justify-center rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 touch-manipulation ${
-                page === currentPage
+                pageNum === page
                   ? "bg-primary-600 text-white"
                   : "text-gray-600 hover:bg-gray-100"
               }`}
-              aria-current={page === currentPage ? "page" : undefined}
+              aria-current={pageNum === page ? "page" : undefined}
             >
-              {page}
+              {pageNum}
             </Link>
           ))}
         </nav>
@@ -149,8 +180,10 @@ function JobResultsSkeleton() {
 }
 
 export default async function FindJobsPage({
+  params,
   searchParams,
 }: {
+  params: Promise<{ locale: string }>;
   searchParams: Promise<{
     categoryId?: string;
     governorate?: string;
@@ -158,8 +191,11 @@ export default async function FindJobsPage({
     page?: string;
   }>;
 }) {
+  const { locale } = await params;
+  unstable_setRequestLocale(locale);
+  
   const t = await getTranslations("jobs.list");
-  const params = await searchParams;
+  const params_awaited = await searchParams;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -169,16 +205,16 @@ export default async function FindJobsPage({
         {/* Sidebar filters */}
         <aside className="w-full shrink-0 lg:w-64">
           <FindJobsSearch
-            currentCategory={params.categoryId}
-            currentGovernorate={params.governorate}
-            currentSearch={params.search}
+            currentCategory={params_awaited.categoryId}
+            currentGovernorate={params_awaited.governorate}
+            currentSearch={params_awaited.search}
           />
         </aside>
 
         {/* Main content */}
         <div className="min-w-0 flex-1">
           <Suspense fallback={<JobResultsSkeleton />}>
-            <JobResults searchParams={params} />
+            <JobResults searchParams={params_awaited} locale={locale} />
           </Suspense>
         </div>
       </div>

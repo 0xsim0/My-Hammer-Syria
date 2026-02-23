@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import NextImage from "next/image";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Button, Card, CardContent, Input } from "@/components/ui";
@@ -72,6 +73,7 @@ export default function EditProfilePage() {
   useEffect(() => {
     fetchUser();
     fetchCategories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function fetchCategories() {
@@ -401,10 +403,11 @@ export default function EditProfilePage() {
                 <div className="grid grid-cols-3 gap-3">
                   {portfolioItems.map((item) => (
                     <div key={item.id} className="group relative aspect-square overflow-hidden rounded-lg border border-gray-200">
-                      <img
+                      <NextImage
                         src={item.imageUrl}
                         alt={item.title || "Portfolio item"}
-                        className="h-full w-full object-cover"
+                        fill
+                        className="object-cover"
                       />
                       <button
                         type="button"

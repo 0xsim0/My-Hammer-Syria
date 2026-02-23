@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import NextImage from "next/image";
 import { useRouter } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { useForm } from "react-hook-form";
@@ -320,7 +321,7 @@ export function PostJobForm({ categories }: PostJobFormProps) {
               <div className="mb-4 flex flex-wrap gap-3">
                 {images.map((url, i) => (
                   <div key={i} className="relative h-24 w-24 overflow-hidden rounded-lg border">
-                    <img src={url} alt="" className="h-full w-full object-cover" />
+                    <NextImage src={url} alt="" fill className="object-cover" />
                     <button
                       type="button"
                       onClick={() => removeImage(i)}

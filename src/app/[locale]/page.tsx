@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { getTranslations, getLocale } from "next-intl/server";
+import { getTranslations, getLocale, unstable_setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Badge, Card, CardContent, Skeleton } from "@/components/ui";
 import { prisma } from "@/lib/prisma";
@@ -47,14 +47,28 @@ async function FeaturedJobs() {
   }> = [];
 
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const res = await fetch(`${baseUrl}/api/jobs?status=OPEN&limit=6`, {
-      next: { revalidate: 60 },
+    // Direct Prisma query - much faster than fetch to API
+    const dbJobs = await prisma.job.findMany({
+      where: { status: "OPEN" },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        governorate: true,
+        budgetMin: true,
+        budgetMax: true,
+        currency: true,
+        status: true,
+        createdAt: true,
+        category: { select: { name: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 6,
     });
-    if (res.ok) {
-      const data = await res.json();
-      jobs = data.jobs || [];
-    }
+    jobs = dbJobs.map(job => ({
+      ...job,
+      createdAt: job.createdAt.toISOString(),
+    }));
   } catch {
     // Silently fail - show empty state
   }
@@ -141,13 +155,18 @@ async function ServiceCategories({ locale }: { locale: string }) {
   }> = [];
 
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const res = await fetch(`${baseUrl}/api/categories`, {
-      next: { revalidate: 3600 },
+    // Direct Prisma query - much faster than fetch to API
+    categories = await prisma.category.findMany({
+      where: { isActive: true },
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+        nameAr: true,
+        icon: true,
+      },
+      orderBy: { name: "asc" },
     });
-    if (res.ok) {
-      categories = await res.json();
-    }
   } catch {
     // Silently fail
   }
@@ -184,9 +203,12 @@ async function ServiceCategories({ locale }: { locale: string }) {
   );
 }
 
-export default async function LandingPage() {
+export default async function LandingPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  // Enable static rendering optimization
+  unstable_setRequestLocale(locale);
+  
   const t = await getTranslations("landing");
-  const locale = await getLocale();
 
   // Load real stats from DB
   const [craftsmenCount, jobsCount] = await Promise.all([
@@ -514,4 +536,9 @@ export default async function LandingPage() {
       </section>
     </div>
   );
+}
+
+// Add static params generation for all locales
+export function generateStaticParams() {
+  return [{ locale: "ar" }, { locale: "en" }];
 }
