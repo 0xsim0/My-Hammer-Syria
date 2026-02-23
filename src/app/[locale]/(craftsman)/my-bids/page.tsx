@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { Badge, Card, CardContent, Skeleton } from "@/components/ui";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { BID_STATUSES } from "@/lib/constants";
@@ -25,9 +26,15 @@ interface Bid {
 export default function MyBidsPage() {
   const t = useTranslations("bids");
   const tJobs = useTranslations("jobs");
+  const { status } = useSession();
+  const router = useRouter();
   const [bids, setBids] = useState<Bid[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<string>("all");
+
+  useEffect(() => {
+    if (status === "unauthenticated") router.push("/login");
+  }, [status, router]);
 
   useEffect(() => {
     async function fetchBids() {

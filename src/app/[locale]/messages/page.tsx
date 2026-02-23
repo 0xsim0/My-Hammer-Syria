@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { Avatar, Card, CardContent, Skeleton } from "@/components/ui";
 import { formatRelativeDate } from "@/lib/utils";
 
@@ -24,6 +26,12 @@ interface Conversation {
 
 export default function MessagesPage() {
   const t = useTranslations("chat");
+  const { status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "unauthenticated") router.push("/login");
+  }, [status, router]);
 
   const { data, isLoading: loading } = useQuery({
     queryKey: ["conversations"],
