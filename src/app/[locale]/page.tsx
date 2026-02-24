@@ -3,8 +3,22 @@ import { getTranslations, getLocale, unstable_setRequestLocale } from "next-intl
 import { Link } from "@/i18n/navigation";
 import { Badge, Card, CardContent, Skeleton } from "@/components/ui";
 import { prisma } from "@/lib/prisma";
+import {
+  Hammer,
+  Wrench,
+  ClipboardList,
+  Users,
+  CheckCircle2,
+  ThumbsUp,
+  ArrowLeft,
+  ArrowRight,
+  ShieldCheck,
+  MessageCircle,
+  Star,
+  ChevronRight,
+} from "lucide-react";
 
-// Emoji map keyed by category slug (covers both seed slugs and legacy slugs)
+// Emoji / icon map keyed by category slug
 const CATEGORY_EMOJI: Record<string, string> = {
   plumbing: "🔧",
   electrical: "⚡",
@@ -28,6 +42,7 @@ const CATEGORY_EMOJI: Record<string, string> = {
   general: "🛠️",
 };
 
+// ── Featured Jobs ────────────────────────────────────────────────────────────
 async function FeaturedJobs() {
   const t = await getTranslations("landing");
   const tJobs = await getTranslations("jobs");
@@ -47,7 +62,6 @@ async function FeaturedJobs() {
   }> = [];
 
   try {
-    // Direct Prisma query - much faster than fetch to API
     const dbJobs = await prisma.job.findMany({
       where: { status: "OPEN" },
       select: {
@@ -65,12 +79,12 @@ async function FeaturedJobs() {
       orderBy: { createdAt: "desc" },
       take: 6,
     });
-    jobs = dbJobs.map(job => ({
+    jobs = dbJobs.map((job) => ({
       ...job,
       createdAt: job.createdAt.toISOString(),
     }));
   } catch {
-    // Silently fail - show empty state
+    // silent
   }
 
   if (jobs.length === 0) {
@@ -88,30 +102,31 @@ async function FeaturedJobs() {
 
   return (
     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-      {jobs.map((job) => (
+      {jobs.map((job, i) => (
         <Link key={job.id} href={`/jobs/${job.id}`} className="group block">
-          <Card className="h-full overflow-hidden border border-gray-200 transition-all duration-200 group-hover:-translate-y-1 group-hover:border-primary-200 group-hover:shadow-lg">
-            {/* Top accent bar */}
-            <div className="h-1 w-full bg-gradient-to-r from-primary-500 to-primary-600" />
+          <Card
+            className={`h-full overflow-hidden card-accent-start border border-gray-100 transition-all duration-250 group-hover:-translate-y-1.5 group-hover:shadow-xl group-hover:shadow-primary-900/8 group-hover:border-primary-200`}
+            style={{ animationDelay: `${i * 60}ms` }}
+          >
             <CardContent className="p-5">
               <div className="mb-3 flex items-start justify-between gap-2">
-                <h3 className="font-semibold text-gray-900 line-clamp-1 group-hover:text-primary-700 transition-colors">
+                <h3 className="font-semibold text-gray-900 line-clamp-1 group-hover:text-primary-700 transition-colors duration-200">
                   {job.title}
                 </h3>
-                <Badge variant={job.status as "OPEN"}>
+                <Badge variant={job.status as "OPEN"} className="shrink-0">
                   {tJobs(`status.${job.status}` as never)}
                 </Badge>
               </div>
-              <p className="mb-4 text-sm text-gray-600 line-clamp-2 leading-relaxed">
+              <p className="mb-4 text-sm text-gray-500 line-clamp-2 leading-relaxed">
                 {job.description}
               </p>
-              <div className="flex items-center gap-3 border-t border-gray-100 pt-3 text-xs text-gray-500">
+              <div className="flex items-center gap-3 border-t border-gray-100 pt-3 text-xs text-gray-400">
                 <span className="flex items-center gap-1">
                   <span aria-hidden="true">📍</span>
                   {job.governorate}
                 </span>
                 {job.budgetMin != null && (
-                  <span className="flex items-center gap-1 font-medium text-primary-600">
+                  <span className="flex items-center gap-1 font-semibold text-primary-600">
                     <span aria-hidden="true">💰</span>
                     {job.budgetMin.toLocaleString()}
                     {job.budgetMax ? `–${job.budgetMax.toLocaleString()}` : ""}{" "}
@@ -145,6 +160,7 @@ export async function generateMetadata() {
   };
 }
 
+// ── Service Categories ───────────────────────────────────────────────────────
 async function ServiceCategories({ locale }: { locale: string }) {
   let categories: Array<{
     id: string;
@@ -155,26 +171,19 @@ async function ServiceCategories({ locale }: { locale: string }) {
   }> = [];
 
   try {
-    // Direct Prisma query - much faster than fetch to API
     categories = await prisma.category.findMany({
       where: { isActive: true },
-      select: {
-        id: true,
-        slug: true,
-        name: true,
-        nameAr: true,
-        icon: true,
-      },
+      select: { id: true, slug: true, name: true, nameAr: true, icon: true },
       orderBy: { name: "asc" },
     });
   } catch {
-    // Silently fail
+    // silent
   }
 
   if (categories.length === 0) return null;
 
   return (
-    <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
+    <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
       {categories.map((cat) => {
         const emoji = cat.icon || CATEGORY_EMOJI[cat.slug] || "🛠️";
         const label = locale === "ar" ? cat.nameAr : cat.name;
@@ -182,7 +191,7 @@ async function ServiceCategories({ locale }: { locale: string }) {
           <Link
             key={cat.slug}
             href={`/find-jobs?categoryId=${cat.id}`}
-            className="group flex flex-col items-center gap-2.5 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-primary-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 touch-manipulation"
+            className="chip-hover group flex flex-col items-center gap-2.5 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 touch-manipulation"
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-50 transition-colors duration-200 group-hover:bg-primary-100">
               <span
@@ -203,100 +212,149 @@ async function ServiceCategories({ locale }: { locale: string }) {
   );
 }
 
-export default async function LandingPage({ params }: { params: Promise<{ locale: string }> }) {
+// ── Landing Page ─────────────────────────────────────────────────────────────
+export default async function LandingPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
   const { locale } = await params;
-  // Enable static rendering optimization
   unstable_setRequestLocale(locale);
-  
-  const t = await getTranslations("landing");
 
-  // Load real stats from DB
+  const t = await getTranslations("landing");
+  const isRTL = locale === "ar";
+
   const [craftsmenCount, jobsCount] = await Promise.all([
     prisma.user.count({ where: { role: "CRAFTSMAN", isActive: true } }),
     prisma.job.count(),
   ]).catch(() => [0, 0]);
 
+  const ArrowIcon = isRTL ? ArrowRight : ArrowLeft;
+
   return (
     <div className="flex flex-col">
-      {/* ── Hero Section ── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary-700 via-primary-600 to-primary-500">
-        {/* Decorative geometric pattern inspired by Syrian art */}
-        <div className="pointer-events-none absolute inset-0 opacity-[0.07]">
-          <svg
-            className="h-full w-full"
-            viewBox="0 0 800 500"
-            fill="none"
-            aria-hidden="true"
-            preserveAspectRatio="xMidYMid slice"
-          >
+
+      {/* ══════════════════════════════════════════
+          HERO
+      ══════════════════════════════════════════ */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#064e2c] via-primary-700 to-primary-600">
+
+        {/* Grain / noise texture */}
+        <svg
+          className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.07]"
+          aria-hidden="true"
+          preserveAspectRatio="xMidYMid slice"
+        >
+          <filter id="grain">
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.85"
+              numOctaves="4"
+              stitchTiles="stitch"
+            />
+          </filter>
+          <rect width="100%" height="100%" filter="url(#grain)" />
+        </svg>
+
+        {/* Geometric diamond pattern */}
+        <div className="pointer-events-none absolute inset-0 opacity-[0.055]" aria-hidden="true">
+          <svg className="h-full w-full" viewBox="0 0 800 500" fill="none" preserveAspectRatio="xMidYMid slice">
             <defs>
-              <pattern
-                id="hero-pattern"
-                x="0"
-                y="0"
-                width="80"
-                height="80"
-                patternUnits="userSpaceOnUse"
-              >
-                <path d="M40 0L80 40L40 80L0 40Z" stroke="white" strokeWidth="1.5" fill="none" />
-                <circle cx="40" cy="40" r="10" stroke="white" strokeWidth="1" fill="none" />
-                <circle cx="40" cy="40" r="3" fill="white" />
+              <pattern id="hero-diamonds" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
+                <path d="M40 4L76 40L40 76L4 40Z" stroke="white" strokeWidth="1.2" fill="none" />
+                <circle cx="40" cy="40" r="5" stroke="white" strokeWidth="0.8" fill="none" />
               </pattern>
             </defs>
-            <rect width="800" height="500" fill="url(#hero-pattern)" />
+            <rect width="800" height="500" fill="url(#hero-diamonds)" />
           </svg>
         </div>
 
-        {/* Radial glow in center */}
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(255,255,255,0.08)_0%,_transparent_70%)]" />
+        {/* Radial center glow */}
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(255,255,255,0.07)_0%,transparent_100%)]" />
+
+        {/* Floating decorative tool icons */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+          <div className="absolute -top-6 end-[8%] anim-float opacity-[0.07]">
+            <Hammer className="h-40 w-40 text-white" />
+          </div>
+          <div className="absolute bottom-16 start-[4%] anim-float-b opacity-[0.06]">
+            <Wrench className="h-28 w-28 text-white" />
+          </div>
+          <div className="absolute top-1/3 end-[25%] anim-float-c opacity-[0.04]">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1">
+              <path d="M12 2L22 12L12 22L2 12Z" />
+            </svg>
+          </div>
+        </div>
 
         <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-36">
           <div className="mx-auto max-w-3xl text-center">
+
             {/* Trust badge */}
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-sm">
-              <span className="h-2 w-2 rounded-full bg-secondary-400 animate-pulse" aria-hidden="true" />
-              {locale === "ar" ? "منصة الحرفيين الموثوقة في سوريا" : "Syria's Trusted Craftsmen Platform"}
+            <div className="anim-fade-in mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-sm">
+              <span className="h-2 w-2 rounded-full bg-emerald-300 animate-pulse" aria-hidden="true" />
+              {locale === "ar"
+                ? "منصة الحرفيين الموثوقة في سوريا"
+                : "Syria's Trusted Craftsmen Platform"}
             </div>
 
-            <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
+            {/* H1 */}
+            <h1 className="anim-fade-in-up anim-delay-100 text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
               {t("hero.title")}
             </h1>
-            <p className="mt-5 text-lg text-primary-100 sm:text-xl leading-relaxed">
+
+            {/* Subtitle */}
+            <p className="anim-fade-in-up anim-delay-200 mt-5 text-lg text-primary-100 sm:text-xl leading-relaxed">
               {t("hero.subtitle")}
             </p>
 
-            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            {/* CTA Buttons */}
+            <div className="anim-fade-in-up anim-delay-300 mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link
                 href="/post-job"
-                className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-white px-8 py-3.5 text-base font-bold text-primary-700 shadow-lg shadow-black/20 transition-all duration-200 hover:bg-primary-50 hover:scale-105 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary-700 touch-manipulation sm:w-auto"
+                className="group inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-white px-8 py-3.5 text-base font-bold text-primary-700 shadow-lg shadow-black/25 transition-all duration-200 hover:bg-primary-50 hover:scale-105 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary-700 touch-manipulation sm:w-auto"
               >
-                <span className="me-2" aria-hidden="true">🔨</span>
+                <Hammer className="h-4 w-4 transition-transform duration-300 group-hover:rotate-12" aria-hidden="true" />
                 {t("hero.postJob")}
               </Link>
               <Link
                 href="/find-jobs"
-                className="inline-flex min-h-12 w-full items-center justify-center rounded-xl border-2 border-white/70 px-8 py-3.5 text-base font-bold text-white backdrop-blur-sm transition-all duration-200 hover:bg-white/15 hover:border-white hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary-700 touch-manipulation sm:w-auto"
+                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border-2 border-white/60 px-8 py-3.5 text-base font-bold text-white backdrop-blur-sm transition-all duration-200 hover:bg-white/15 hover:border-white hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary-700 touch-manipulation sm:w-auto"
               >
-                <span className="me-2" aria-hidden="true">🔍</span>
+                <Wrench className="h-4 w-4" aria-hidden="true" />
                 {t("hero.findWork")}
               </Link>
             </div>
 
             {/* Stats */}
-            <div className="mt-14 grid grid-cols-3 gap-6">
+            <div className="anim-fade-in-up anim-delay-500 mt-14 grid grid-cols-3 gap-4 sm:gap-6">
               {[
-                { value: craftsmenCount > 0 ? `${craftsmenCount}+` : "500+", label: t("hero.stats.craftsmen"), icon: "👷" },
-                { value: jobsCount > 0 ? `${jobsCount}+` : "1,000+", label: t("hero.stats.jobs"), icon: "📋" },
-                { value: "14", label: t("hero.stats.cities"), icon: "🏙️" },
+                {
+                  value: craftsmenCount > 0 ? `${craftsmenCount}+` : "500+",
+                  label: t("hero.stats.craftsmen"),
+                  icon: "👷",
+                },
+                {
+                  value: jobsCount > 0 ? `${jobsCount}+` : "1,000+",
+                  label: t("hero.stats.jobs"),
+                  icon: "📋",
+                },
+                {
+                  value: "14",
+                  label: t("hero.stats.cities"),
+                  icon: "🏙️",
+                },
               ].map((stat) => (
                 <div
                   key={stat.label}
-                  className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-sm"
+                  className="group rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-sm transition-all duration-200 hover:bg-white/15 hover:border-white/25"
                 >
-                  <p className="text-2xl font-extrabold text-white sm:text-3xl lg:text-4xl">
+                  <p className="text-2xl font-black text-white sm:text-3xl lg:text-4xl tracking-tight">
                     {stat.value}
                   </p>
-                  <p className="mt-1 text-xs font-medium text-primary-200 sm:text-sm">{stat.label}</p>
+                  <p className="mt-1 text-xs font-medium text-primary-200 sm:text-sm">
+                    {stat.label}
+                  </p>
                 </div>
               ))}
             </div>
@@ -305,18 +363,30 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
 
         {/* Wave divider */}
         <div className="absolute bottom-0 start-0 end-0">
-          <svg viewBox="0 0 1440 72" fill="none" className="w-full text-white" aria-hidden="true" preserveAspectRatio="none">
-            <path d="M0 36C240 72 480 0 720 36C960 72 1200 0 1440 36V72H0V36Z" fill="currentColor" />
+          <svg
+            viewBox="0 0 1440 64"
+            fill="none"
+            className="w-full text-white"
+            aria-hidden="true"
+            preserveAspectRatio="none"
+          >
+            <path
+              d="M0 32C180 64 360 0 540 32C720 64 900 0 1080 32C1260 64 1350 16 1440 32V64H0V32Z"
+              fill="currentColor"
+            />
           </svg>
         </div>
       </section>
 
-      {/* ── How It Works ── */}
+      {/* ══════════════════════════════════════════
+          HOW IT WORKS
+      ══════════════════════════════════════════ */}
       <section className="bg-white py-16 sm:py-24" aria-labelledby="how-it-works-heading">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+
           {/* Section header */}
           <div className="mx-auto max-w-2xl text-center">
-            <span className="inline-block rounded-full bg-primary-100 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary-700">
+            <span className="inline-block rounded-full bg-primary-100 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-primary-700">
               {locale === "ar" ? "كيف يعمل" : "How It Works"}
             </span>
             <h2
@@ -327,37 +397,70 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
             </h2>
           </div>
 
-          <div className="relative mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {/* Connector line (desktop only) */}
-            <div className="absolute top-7 start-0 end-0 hidden h-px bg-gradient-to-r from-transparent via-primary-200 to-transparent lg:block" aria-hidden="true" />
-
-            {(["step1", "step2", "step3", "step4"] as const).map(
-              (step, idx) => (
-                <article key={step} className="relative flex flex-col items-center text-center">
-                  <div className="relative z-10 flex h-14 w-14 items-center justify-center rounded-full bg-primary-600 text-xl font-extrabold text-white shadow-lg shadow-primary-200">
-                    {idx + 1}
+          {/* Steps — card grid */}
+          <div className="relative mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {(
+              [
+                { key: "step1", Icon: ClipboardList },
+                { key: "step2", Icon: Users },
+                { key: "step3", Icon: CheckCircle2 },
+                { key: "step4", Icon: ThumbsUp },
+              ] as const
+            ).map(({ key, Icon }, idx) => (
+              <article key={key} className="relative">
+                <div className="step-card flex h-full flex-col rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+                  {/* Number + icon row */}
+                  <div className="mb-4 flex items-center gap-3">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary-600 text-base font-black text-white shadow-md shadow-primary-200">
+                      {idx + 1}
+                    </div>
+                    <Icon className="h-5 w-5 text-primary-400" aria-hidden="true" />
                   </div>
-                  <h3 className="mt-5 text-lg font-bold text-gray-900">
-                    {t(`howItWorks.${step}.title`)}
+                  <h3 className="text-base font-bold text-gray-900">
+                    {t(`howItWorks.${key}.title`)}
                   </h3>
                   <p className="mt-2 text-sm text-gray-500 leading-relaxed">
-                    {t(`howItWorks.${step}.description`)}
+                    {t(`howItWorks.${key}.description`)}
                   </p>
-                </article>
-              )
-            )}
+                </div>
+
+                {/* Connector arrow between cards (desktop) */}
+                {idx < 3 && (
+                  <div
+                    className="absolute top-1/2 -end-3 z-10 hidden -translate-y-1/2 lg:flex"
+                    aria-hidden="true"
+                  >
+                    <ChevronRight className="h-5 w-5 text-primary-300" />
+                  </div>
+                )}
+              </article>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ── Service Categories ── */}
+      {/* ══════════════════════════════════════════
+          SERVICE CATEGORIES
+      ══════════════════════════════════════════ */}
       <section
-        className="bg-gray-50 py-16 sm:py-24"
+        className="relative overflow-hidden bg-gray-50 py-16 sm:py-24"
         aria-labelledby="categories-heading"
       >
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Subtle background dots */}
+        <div className="pointer-events-none absolute inset-0 opacity-[0.04]" aria-hidden="true">
+          <svg className="h-full w-full" viewBox="0 0 400 400" fill="none" preserveAspectRatio="xMidYMid slice">
+            <defs>
+              <pattern id="dots" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+                <circle cx="2" cy="2" r="1.5" fill="#12bc6c" />
+              </pattern>
+            </defs>
+            <rect width="400" height="400" fill="url(#dots)" />
+          </svg>
+        </div>
+
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
-            <span className="inline-block rounded-full bg-primary-100 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary-700">
+            <span className="inline-block rounded-full bg-primary-100 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-primary-700">
               {locale === "ar" ? "التخصصات" : "Services"}
             </span>
             <h2
@@ -375,7 +478,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
 
           <Suspense
             fallback={
-              <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
+              <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
                 {Array.from({ length: 14 }).map((_, i) => (
                   <Skeleton key={i} variant="card" className="h-24" />
                 ))}
@@ -387,11 +490,14 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
         </div>
       </section>
 
-      {/* ── Trust / Why Us ── */}
+      {/* ══════════════════════════════════════════
+          TRUST / WHY US
+      ══════════════════════════════════════════ */}
       <section className="bg-white py-16 sm:py-24" aria-labelledby="trust-heading">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+
           <div className="mx-auto max-w-2xl text-center">
-            <span className="inline-block rounded-full bg-secondary-100 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-secondary-700">
+            <span className="inline-block rounded-full bg-amber-100 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-amber-700">
               {locale === "ar" ? "لماذا نحن" : "Why Choose Us"}
             </span>
             <h2
@@ -402,24 +508,33 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
             </h2>
           </div>
 
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-12 grid gap-6 sm:grid-cols-3">
             {[
               {
-                icon: "✅",
+                Icon: ShieldCheck,
+                color: "text-primary-600",
+                bg: "bg-primary-50",
+                accentBg: "bg-primary-600",
                 titleAr: "حرفيون موثوقون",
                 titleEn: "Verified Craftsmen",
                 descAr: "جميع الحرفيين لدينا موثقون ومراجَعون من قبل الفريق",
                 descEn: "All craftsmen are verified and reviewed by our team",
               },
               {
-                icon: "💬",
+                Icon: MessageCircle,
+                color: "text-blue-600",
+                bg: "bg-blue-50",
+                accentBg: "bg-blue-600",
                 titleAr: "تواصل مباشر",
                 titleEn: "Direct Communication",
                 descAr: "تحدث مع الحرفي مباشرةً عبر نظام المراسلة الآمن",
                 descEn: "Talk directly with craftsmen through our secure messaging",
               },
               {
-                icon: "⭐",
+                Icon: Star,
+                color: "text-amber-600",
+                bg: "bg-amber-50",
+                accentBg: "bg-amber-500",
                 titleAr: "تقييمات شفافة",
                 titleEn: "Transparent Reviews",
                 descAr: "اقرأ تقييمات حقيقية من عملاء سابقين قبل الاختيار",
@@ -428,16 +543,19 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
             ].map((item) => (
               <div
                 key={item.titleEn}
-                className="group flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-primary-200 hover:shadow-md"
+                className="step-card group relative overflow-hidden flex flex-col gap-5 rounded-2xl border border-gray-100 bg-white p-7 shadow-sm"
               >
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-50 text-2xl transition-colors duration-200 group-hover:bg-primary-100">
-                  {item.icon}
+                {/* Accent top bar */}
+                <div className={`absolute top-0 start-0 end-0 h-0.5 ${item.accentBg} opacity-0 transition-opacity duration-300 group-hover:opacity-100`} />
+
+                <div className={`flex h-13 w-13 h-[52px] w-[52px] items-center justify-center rounded-2xl ${item.bg}`}>
+                  <item.Icon className={`h-6 w-6 ${item.color}`} aria-hidden="true" />
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-gray-900">
                     {locale === "ar" ? item.titleAr : item.titleEn}
                   </h3>
-                  <p className="mt-1.5 text-sm text-gray-500 leading-relaxed">
+                  <p className="mt-2 text-sm text-gray-500 leading-relaxed">
                     {locale === "ar" ? item.descAr : item.descEn}
                   </p>
                 </div>
@@ -447,15 +565,15 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
         </div>
       </section>
 
-      {/* ── Featured Jobs ── */}
-      <section
-        className="bg-gray-50 py-16 sm:py-24"
-        aria-labelledby="featured-jobs-heading"
-      >
+      {/* ══════════════════════════════════════════
+          FEATURED JOBS
+      ══════════════════════════════════════════ */}
+      <section className="bg-gray-50 py-16 sm:py-24" aria-labelledby="featured-jobs-heading">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+
           <div className="flex items-end justify-between">
             <div>
-              <span className="inline-block rounded-full bg-primary-100 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary-700">
+              <span className="inline-block rounded-full bg-primary-100 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-primary-700">
                 {locale === "ar" ? "أحدث الطلبات" : "Latest Jobs"}
               </span>
               <h2
@@ -467,10 +585,10 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
             </div>
             <Link
               href="/find-jobs"
-              className="hidden items-center gap-1 rounded-lg px-4 py-2 text-sm font-semibold text-primary-600 transition-colors hover:bg-primary-50 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:rounded-lg sm:flex"
+              className="hidden items-center gap-1.5 rounded-xl border border-primary-200 bg-primary-50 px-4 py-2 text-sm font-semibold text-primary-700 transition-all duration-200 hover:bg-primary-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 sm:flex"
             >
               {t("featuredJobs.viewAll")}
-              <span aria-hidden="true">←</span>
+              <ArrowIcon className="h-3.5 w-3.5" aria-hidden="true" />
             </Link>
           </div>
 
@@ -480,54 +598,72 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
             </Suspense>
           </div>
 
-          <div className="mt-8 text-center sm:hidden">
+          <div className="mt-6 text-center sm:hidden">
             <Link
               href="/find-jobs"
-              className="inline-flex items-center gap-1 rounded-lg px-4 py-2 text-sm font-semibold text-primary-600 transition-colors hover:bg-primary-50 hover:text-primary-700"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-primary-200 bg-primary-50 px-5 py-2.5 text-sm font-semibold text-primary-700 transition-colors hover:bg-primary-100"
             >
               {t("featuredJobs.viewAll")}
-              <span aria-hidden="true">←</span>
+              <ArrowIcon className="h-3.5 w-3.5" aria-hidden="true" />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ── CTA for Craftsmen ── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary-700 via-primary-600 to-primary-500 py-20 sm:py-28">
-        {/* Background pattern */}
-        <div className="pointer-events-none absolute inset-0 opacity-[0.06]">
-          <svg className="h-full w-full" viewBox="0 0 400 300" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
+      {/* ══════════════════════════════════════════
+          CTA FOR CRAFTSMEN
+      ══════════════════════════════════════════ */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#064e2c] via-primary-700 to-primary-500 py-20 sm:py-28">
+
+        {/* Grain */}
+        <svg className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.06]" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
+          <filter id="grain-cta">
+            <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="4" stitchTiles="stitch" />
+          </filter>
+          <rect width="100%" height="100%" filter="url(#grain-cta)" />
+        </svg>
+
+        {/* Pattern */}
+        <div className="pointer-events-none absolute inset-0 opacity-[0.06]" aria-hidden="true">
+          <svg className="h-full w-full" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
             <defs>
-              <pattern id="cta-pattern" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
-                <circle cx="30" cy="30" r="20" stroke="white" strokeWidth="1" fill="none" />
-                <circle cx="30" cy="30" r="8" stroke="white" strokeWidth="1" fill="none" />
+              <pattern id="cta-circles" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+                <circle cx="30" cy="30" r="22" stroke="white" strokeWidth="1" fill="none" />
+                <circle cx="30" cy="30" r="10" stroke="white" strokeWidth="0.8" fill="none" />
               </pattern>
             </defs>
-            <rect width="400" height="300" fill="url(#cta-pattern)" />
+            <rect width="400" height="300" fill="url(#cta-circles)" />
           </svg>
+        </div>
+
+        {/* Floating hammer */}
+        <div className="pointer-events-none absolute end-[6%] top-[10%] anim-float-b opacity-[0.07]" aria-hidden="true">
+          <Hammer className="h-32 w-32 text-white" />
         </div>
 
         <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-sm">
-            <span aria-hidden="true">🔨</span>
+            <Hammer className="h-4 w-4" aria-hidden="true" />
             {locale === "ar" ? "للحرفيين المحترفين" : "For Professional Craftsmen"}
           </div>
+
           <h2 className="text-3xl font-extrabold text-white sm:text-4xl lg:text-5xl">
             {t("cta.craftsman.title")}
           </h2>
-          <p className="mt-4 text-lg text-primary-100 leading-relaxed">
+          <p className="mt-4 text-lg text-primary-100 leading-relaxed max-w-2xl mx-auto">
             {t("cta.craftsman.description")}
           </p>
+
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
               href="/register"
-              className="inline-flex min-h-12 items-center justify-center rounded-xl bg-white px-10 py-3.5 text-base font-bold text-primary-700 shadow-lg shadow-black/20 transition-all duration-200 hover:bg-primary-50 hover:scale-105 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary-700 touch-manipulation"
+              className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-white px-10 py-3.5 text-base font-bold text-primary-700 shadow-lg shadow-black/25 transition-all duration-200 hover:bg-primary-50 hover:scale-105 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary-700 touch-manipulation"
             >
               {t("cta.craftsman.button")}
             </Link>
             <Link
               href="/find-jobs"
-              className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-white/70 px-8 py-3.5 text-base font-bold text-white backdrop-blur-sm transition-all duration-200 hover:bg-white/15 hover:border-white hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white touch-manipulation"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-white/60 px-8 py-3.5 text-base font-bold text-white backdrop-blur-sm transition-all duration-200 hover:bg-white/15 hover:border-white hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white touch-manipulation"
             >
               {locale === "ar" ? "تصفح الطلبات" : "Browse Jobs"}
             </Link>
@@ -538,7 +674,6 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
   );
 }
 
-// Add static params generation for all locales
 export function generateStaticParams() {
   return [{ locale: "ar" }, { locale: "en" }];
 }

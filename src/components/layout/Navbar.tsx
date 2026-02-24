@@ -77,7 +77,7 @@ export default function Navbar() {
   return (
     <nav
       aria-label="Main navigation"
-      className="sticky top-0 z-40 border-b border-gray-100 bg-white/98 shadow-sm backdrop-blur-md"
+      className="sticky top-0 z-40 border-b border-gray-100/80 bg-white/96 shadow-[0_1px_8px_rgba(0,0,0,0.06)] backdrop-blur-md"
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
@@ -85,7 +85,7 @@ export default function Navbar() {
           href="/"
           className="group flex flex-shrink-0 items-center gap-2.5"
         >
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-600 shadow-sm transition-transform duration-200 group-hover:scale-105">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 shadow-md shadow-primary-200 transition-all duration-200 group-hover:scale-105 group-hover:shadow-primary-300">
             <Hammer className="h-4 w-4 text-white" aria-hidden="true" />
           </div>
           <span className="text-lg font-bold tracking-tight text-gray-900">
@@ -101,14 +101,11 @@ export default function Navbar() {
               href={link.href}
               className={`relative rounded-lg px-3.5 py-2 text-sm font-medium transition-all duration-150 ${
                 isActive(link.href)
-                  ? "text-primary-700"
+                  ? "bg-primary-50 text-primary-700 ring-1 ring-primary-100"
                   : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               }`}
             >
               {link.label}
-              {isActive(link.href) && (
-                <span className="absolute bottom-0 start-3 end-3 h-0.5 rounded-full bg-primary-500" />
-              )}
             </Link>
           ))}
         </div>
@@ -248,7 +245,7 @@ export default function Navbar() {
             }`}
           >
             {/* Drawer header */}
-            <div className="flex items-center justify-between border-b border-gray-100 bg-gradient-to-r from-primary-600 to-primary-700 px-4 py-4">
+            <div className="flex items-center justify-between border-b border-primary-800 bg-gradient-to-br from-[#064e2c] to-primary-700 px-4 py-4">
               <div className="flex items-center gap-2.5">
                 <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/20">
                   <Hammer className="h-4 w-4 text-white" aria-hidden="true" />
@@ -293,14 +290,14 @@ export default function Navbar() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className={`flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                     isActive(link.href)
-                      ? "bg-primary-50 text-primary-700"
+                      ? "bg-primary-50 text-primary-700 ring-1 ring-primary-100"
                       : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
                   }`}
                 >
                   {isActive(link.href) && (
-                    <span className="me-2 h-1.5 w-1.5 rounded-full bg-primary-500" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-primary-500" />
                   )}
                   {link.label}
                 </Link>
