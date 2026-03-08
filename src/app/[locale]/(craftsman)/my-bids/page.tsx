@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
 import { Badge, Card, CardContent, Skeleton } from "@/components/ui";
 import { formatCurrency, formatDate } from "@/lib/utils";
@@ -26,6 +26,7 @@ interface Bid {
 export default function MyBidsPage() {
   const t = useTranslations("bids");
   const tJobs = useTranslations("jobs");
+  const locale = useLocale();
   const { status } = useSession();
   const router = useRouter();
   const [bids, setBids] = useState<Bid[]>([]);
@@ -124,12 +125,12 @@ export default function MyBidsPage() {
                   </p>
                   <div className="mt-3 flex items-center gap-4 text-sm text-gray-500">
                     <span className="font-semibold text-gray-900">
-                      {formatCurrency(bid.price, bid.currency)}
+                      {formatCurrency(bid.price, bid.currency, locale)}
                     </span>
                     <span>
                       {bid.estimatedDays} {bid.estimatedDays === 1 ? t("day") : t("days")}
                     </span>
-                    <span>{formatDate(bid.createdAt)}</span>
+                    <span>{formatDate(bid.createdAt, locale)}</span>
                   </div>
                 </CardContent>
               </Card>

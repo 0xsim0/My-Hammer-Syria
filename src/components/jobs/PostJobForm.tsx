@@ -85,7 +85,7 @@ export function PostJobForm({ categories }: PostJobFormProps) {
   const goNext = async () => {
     const fields = stepFields[step];
     if (fields && fields.length > 0) {
-      const valid = await trigger(fields);
+      const valid = await trigger(fields, { shouldFocus: true });
       if (!valid) return;
     }
     setStep((s) => Math.min(s + 1, TOTAL_STEPS));

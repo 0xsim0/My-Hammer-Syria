@@ -15,6 +15,17 @@ export default function ForgotPasswordPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      setError("Email is required");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      setError(t("errors.invalidEmail"));
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await fetch("/api/auth/forgot-password", {
@@ -52,7 +63,7 @@ export default function ForgotPasswordPage() {
             <div className="flex flex-col items-center gap-4 py-4 text-center">
               <div className="text-4xl" aria-hidden="true">📧</div>
               <p className="text-sm text-gray-700">
-                If an account with that email exists, a password reset link has been sent.
+                {t("resetLinkSent")}
               </p>
               <Link href="/login" className="text-sm font-medium text-primary-600 hover:underline">
                 {t("backToLogin")}
@@ -66,7 +77,7 @@ export default function ForgotPasswordPage() {
                 </div>
               )}
               <p className="text-sm text-gray-600">
-                Enter your email address and we will send you a link to reset your password.
+                {t("forgotPasswordDescription")}
               </p>
               <Input
                 label={t("email")}
@@ -78,7 +89,7 @@ export default function ForgotPasswordPage() {
                 placeholder="you@example.com"
               />
               <Button type="submit" isLoading={loading} className="w-full">
-                Send Reset Link
+                {t("sendResetLink")}
               </Button>
               <p className="text-center text-sm text-gray-600">
                 <Link href="/login" className="font-medium text-primary-600 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:rounded-sm">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { signIn } from "next-auth/react";
 import { useRouter } from "@/i18n/navigation";
@@ -9,15 +9,28 @@ import { Button, Input, Card, CardHeader, CardContent } from "@/components/ui";
 
 export default function LoginPage() {
   const t = useTranslations("auth");
+  const locale = useLocale();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const isAr = locale === "ar";
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
+
+    if (!email.trim()) {
+      setError(isAr ? "البريد الإلكتروني مطلوب" : "Email is required");
+      return;
+    }
+    if (!password) {
+      setError(isAr ? "كلمة المرور مطلوبة" : "Password is required");
+      return;
+    }
+
     setLoading(true);
 
     try {

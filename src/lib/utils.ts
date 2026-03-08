@@ -9,7 +9,7 @@ export function cn(...inputs: ClassValue[]) {
 export function formatCurrency(
   amount: number,
   currency: string,
-  locale: string = "ar"
+  locale: string = "en"
 ): string {
   if (currency === "USD") {
     return new Intl.NumberFormat(locale === "ar" ? "ar-SY" : "en-US", {
@@ -28,7 +28,7 @@ export function formatCurrency(
   return locale === "ar" ? `${formatted} ${symbol}` : `${formatted} ${symbol}`;
 }
 
-export function formatDate(date: string | Date | null | undefined, locale: string = "ar"): string {
+export function formatDate(date: string | Date | null | undefined, locale: string = "en"): string {
   if (!date) return "";
   const d = new Date(date);
   if (isNaN(d.getTime())) return "";
@@ -39,7 +39,7 @@ export function formatDate(date: string | Date | null | undefined, locale: strin
   }).format(d);
 }
 
-export function formatRelativeDate(date: string | Date, locale: string = "ar"): string {
+export function formatRelativeDate(date: string | Date, locale: string = "en"): string {
   const now = new Date();
   const d = new Date(date);
   const diffMs = now.getTime() - d.getTime();

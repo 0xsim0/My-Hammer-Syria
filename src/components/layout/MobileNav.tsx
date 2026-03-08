@@ -23,8 +23,8 @@ export default function MobileNav() {
   const items: NavItem[] = [
     { href: "/", label: t("home"), icon: Home },
     {
-      href: role === "CUSTOMER" ? "/my-jobs" : "/find-jobs",
-      label: role === "CUSTOMER" ? t("myJobs") : t("findJobs"),
+      href: role === "CUSTOMER" ? "/my-jobs" : role === "CRAFTSMAN" ? "/find-jobs" : "/craftsmen",
+      label: role === "CUSTOMER" ? t("myJobs") : role === "CRAFTSMAN" ? t("findJobs") : t("findCraftsmen"),
       icon: Briefcase,
     },
     { href: "/post-job", label: t("postJob"), icon: Plus, isCenter: true },

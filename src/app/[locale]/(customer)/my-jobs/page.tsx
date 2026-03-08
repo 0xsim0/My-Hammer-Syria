@@ -118,6 +118,7 @@ export default async function MyJobsPage({
   searchParams: Promise<{ status?: string }>;
 }) {
   const t = await getTranslations("jobs.myJobs");
+  const tNav = await getTranslations("nav");
   const params = await searchParams;
 
   return (
@@ -125,7 +126,7 @@ export default async function MyJobsPage({
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">{t("title")}</h1>
         <Button asChild size="sm">
-          <Link href="/post-job">{t("postFirst")}</Link>
+          <Link href="/post-job">{tNav("postJob")}</Link>
         </Button>
       </div>
 

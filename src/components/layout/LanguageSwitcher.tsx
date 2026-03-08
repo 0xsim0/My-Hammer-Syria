@@ -22,6 +22,7 @@ export default function LanguageSwitcher() {
 
   return (
     <button
+      type="button"
       onClick={handleSwitch}
       aria-label="Switch language"
       className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"

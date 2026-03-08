@@ -37,7 +37,7 @@ export default function Navbar() {
     if (!session) {
       return [
         { href: "/", label: t("home") },
-        { href: "/find-jobs", label: t("findJobs") },
+        { href: "/craftsmen", label: t("findCraftsmen") },
         { href: "/login", label: t("login") },
         { href: "/register", label: t("register") },
       ];
