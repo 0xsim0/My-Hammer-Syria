@@ -3,6 +3,7 @@ import { getTranslations, getLocale, unstable_setRequestLocale } from "next-intl
 import { Link } from "@/i18n/navigation";
 import { Badge, Card, CardContent, Skeleton } from "@/components/ui";
 import { prisma } from "@/lib/prisma";
+import { CURRENCY_SYMBOLS } from "@/lib/constants";
 import {
   Hammer,
   Wrench,
@@ -51,6 +52,7 @@ async function FeaturedJobs() {
   let jobs: Array<{
     id: string;
     title: string;
+    titleAr: string | null;
     description: string;
     governorate: string;
     budgetMin: number | null;
@@ -67,6 +69,7 @@ async function FeaturedJobs() {
       select: {
         id: true,
         title: true,
+        titleAr: true,
         description: true,
         governorate: true,
         budgetMin: true,
@@ -105,13 +108,13 @@ async function FeaturedJobs() {
       {jobs.map((job, i) => (
         <Link key={job.id} href={`/jobs/${job.id}`} className="group block">
           <Card
-            className={`h-full overflow-hidden card-accent-start border border-gray-100 transition-all duration-250 group-hover:-translate-y-1.5 group-hover:shadow-xl group-hover:shadow-primary-900/8 group-hover:border-primary-200`}
+            className={`h-full overflow-hidden card-accent-start border border-gray-100 transition-all duration-200 group-hover:-translate-y-1.5 group-hover:shadow-xl group-hover:shadow-primary-900/8 group-hover:border-primary-200`}
             style={{ animationDelay: `${i * 60}ms` }}
           >
             <CardContent className="p-5">
               <div className="mb-3 flex items-start justify-between gap-2">
                 <h3 className="font-semibold text-gray-900 line-clamp-1 group-hover:text-primary-700 transition-colors duration-200">
-                  {job.title}
+                  {locale === "ar" ? (job.titleAr || job.title) : job.title}
                 </h3>
                 <Badge variant={job.status as "OPEN"} className="shrink-0">
                   {tJobs(`status.${job.status}` as never)}
@@ -130,7 +133,7 @@ async function FeaturedJobs() {
                     <span aria-hidden="true">💰</span>
                     {job.budgetMin.toLocaleString()}
                     {job.budgetMax ? `–${job.budgetMax.toLocaleString()}` : ""}{" "}
-                    {job.currency === "SYP" ? "ل.س" : "$"}
+                    {CURRENCY_SYMBOLS[job.currency] ?? job.currency}
                   </span>
                 )}
               </div>
@@ -548,7 +551,7 @@ export default async function LandingPage({
                 {/* Accent top bar */}
                 <div className={`absolute top-0 start-0 end-0 h-0.5 ${item.accentBg} opacity-0 transition-opacity duration-300 group-hover:opacity-100`} />
 
-                <div className={`flex h-13 w-13 h-[52px] w-[52px] items-center justify-center rounded-2xl ${item.bg}`}>
+                <div className={`flex h-[52px] w-[52px] items-center justify-center rounded-2xl ${item.bg}`}>
                   <item.Icon className={`h-6 w-6 ${item.color}`} aria-hidden="true" />
                 </div>
                 <div>
